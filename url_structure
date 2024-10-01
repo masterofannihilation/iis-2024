@@ -1,0 +1,50 @@
+www.utulok.com
+|
+|---/login
+|---/register
+|---/profile
+|    └──/profile/edit
+|
+# display registered users
+# filter users based on their roles
+# edit users, depends on permissions
+|---/users
+|   |---/users/{id}
+|   |   └── /users/{id}/edit
+|   |---/users/create
+|   └── /users?type={type}
+|
+# display registered animals
+# filter animals based on type
+# display their medical records, history and details
+|---/animals
+|   |---/animals/create
+|   |---/animals/{id}
+|   |   |---/animals/{id}/edit
+|   |   |---/animals/{id}/details
+|   |   |---/animals/{id}/history
+|   |   └── /animals/{id}/medical-records
+|   └── /animals?type={type}
+|
+# display available walks for different animals
+|--- /walks
+│   ├── /walks
+│   ├── /walks/create # Creation of a new instance when someone can have an animal on a walk.
+│   ├── /walks/{id}
+│   │   ├── /walks/{id}/edit
+│   │   └── /walks/{id}/assign # reserve a spot for taking an animal on a walk
+|   ├── walks?type={type} #filter based on animal type
+|   ├── walks?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD #filter available walks by date
+|
+# Display all demands for treatment 
+# Create a new health-record/demand when an animal needs treatment
+# Doctor can edit a record if he wants to treat an animal or when a treatement is finished
+|--- /health-records
+│   ├── /health-records
+│   ├── /health-records/create
+│   ├── /health-records/{id}
+│   │   └── /health-records/{id}/edit
+|   ├── /health-records?priority={int}
+|
+|---/about
+|---/contact
