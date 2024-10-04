@@ -1,0 +1,6 @@
+<h1>Walking Schedule</h1>
+<ul>
+    {% for walk in walks %}
+        <li>{{ walk.animal.name }} - {{ walk.scheduled_time }} - {{ walk.status }}</li>
+    {% endfor %}
+</ul>
