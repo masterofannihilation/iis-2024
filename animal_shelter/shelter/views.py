@@ -1,12 +1,19 @@
 from django.shortcuts import render
 from .models import Animal, Walk, VeterinarianRequest
 
+
+# Home page
+def home_page(request):
+    return render(request, "home.html")
+
+
 # List all animals
-def animal_list(request):
+def animals_list(request):
     animals = Animal.objects.all()
-    return render(request, 'shelter/animal_list.html', {'animals': animals})
+    return render(request, "animals/list.html", {"animals": animals})
+
 
 # View for scheduling walks
-def walk_schedule(request):
+def walks_list(request):
     walks = Walk.objects.all()
-    return render(request, 'shelter/walk_schedule.html', {'walks': walks})
+    return render(request, "walks/list.html", {"walks": walks})
