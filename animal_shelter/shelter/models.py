@@ -1,42 +1,53 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+
 # Custom User Model
 class User(AbstractUser):
-    ROLE_CHOICES = (
-        ('Administrator', 'Administrator'),
-        ('Caregiver', 'Caregiver'),
-        ('Veterinarian', 'Veterinarian'),
-        ('Volunteer', 'Volunteer'),
+    class Role(models.TextChoices):
+        ADMINISTRATOR = "Administrator", "Administrator"
+        CAREGIVER = "Caregiver", "Caregiver"
+        VETERINARIAN = "Veterinarian", "Veterinarian"
+        VOLUNTEER = "Volunteer", "Volunteer"
+
+    role = models.CharField(
+        max_length=20,
+        choices=Role.choices,  # Use the enumeration here
     )
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     contact_info = models.TextField(blank=True, null=True)
 
     # Add related_name to avoid conflicts with auth.User
     groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='shelter_user_set',
-        blank=True
+        "auth.Group", related_name="shelter_user_set", blank=True
     )
     user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name='shelter_user_set',
-        blank=True
+        "auth.Permission", related_name="shelter_user_set", blank=True
     )
+
+    def is_authorized(self, min_role: Role) -> bool:
+        order = (
+            User.Role.ADMINISTRATOR,
+            User.Role.CAREGIVER,
+            User.Role.VETERINARIAN,
+            User.Role.VOLUNTEER,
+        )
+        min_role_idx = order.index(min_role)
+        self_role_idx = order.index(self)
+        return self_role_idx <= min_role_idx
 
     def __str__(self):
         return self.username
 
+
 class Animal(models.Model):
-    ANIMAL_TYPES = (
-        ('Dog', 'Dog'),
-        ('Cat', 'Cat'),
-        ('Rabbit', 'Rabbit'),
-        ('Other', 'Other'),
-    )
-    
+    class AnimalType(models.TextChoices):
+        DOG = "Dog", "Dog"
+        CAT = "Cat", "Cat"
+        RABBIT = "Rabbit", "Rabbit"
+        OTHER = "Other", "Other"
+
     name = models.CharField(max_length=100)
-    species = models.CharField(max_length=50, choices=ANIMAL_TYPES)
+    species = models.CharField(max_length=50, choices=AnimalType.choices)
     date_of_birth = models.DateField()
     description = models.TextField()
     intake_date = models.DateField()
@@ -44,34 +55,66 @@ class Animal(models.Model):
     def __str__(self):
         return self.name
 
+
 class Walk(models.Model):
-    animal = models.ForeignKey(Animal, on_delete=models.CASCADE, related_name='walks')
-    volunteer = models.ForeignKey(User, limit_choices_to={'role': 'Volunteer'}, on_delete=models.SET_NULL, null=True, blank=True, related_name='volunteer_walks')
-    caregiver = models.ForeignKey(User, limit_choices_to={'role': 'Caregiver'}, on_delete=models.CASCADE, related_name='caregiver_walks')
+    class Status(models.TextChoices):
+        RESERVED = "Reserved", "Reserved"
+        APPROVED = "Approved", "Approved"
+        BORROWED = "Borrowed", "Borrowed"
+        RETURNED = "Returned", "Returned"
+
+    animal = models.ForeignKey(Animal, on_delete=models.CASCADE, related_name="walks")
+    volunteer = models.ForeignKey(
+        User,
+        limit_choices_to={"role": "Volunteer"},
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="volunteer_walks",
+    )
+    caregiver = models.ForeignKey(
+        User,
+        limit_choices_to={"role": "Caregiver"},
+        on_delete=models.CASCADE,
+        related_name="caregiver_walks",
+    )
     begin_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    STATUS_CHOICES = (
-        ('Reserved', 'Reserved'),
-        ('Approved', 'Approved'),
-        ('Borrowed', 'Borrowed'),
-        ('Returned', 'Returned'),
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.RESERVED
     )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Reserved')
 
     def __str__(self):
-        return f"{self.animal.name} walk at {self.scheduled_time}"
+        return f"{self.animal.name} walk at {self.begin_time}"
+
 
 class VeterinarianRequest(models.Model):
-    animal = models.ForeignKey(Animal, on_delete=models.CASCADE, related_name='vet_requests')
-    caregiver = models.ForeignKey(User, limit_choices_to={'role': 'Caregiver'}, on_delete=models.CASCADE, related_name='caregiver_requests')
-    veterinarian = models.ForeignKey(User, limit_choices_to={'role': 'Veterinarian'}, on_delete=models.SET_NULL, null=True, blank=True, related_name='vet_requests')
-    request_date = models.DateField(auto_now_add=True)
-    STATUS_CHOICES = (
-        ('Requested', 'Requested'),
-        ('Scheduled', 'Scheduled'),
-        ('Completed', 'Completed'),
+    class Status(models.TextChoices):
+        REQUESTED = "Requested", "Requested"
+        SCHEDULED = "Scheduled", "Scheduled"
+        COMPLETED = "Completed", "Completed"
+
+    animal = models.ForeignKey(
+        Animal, on_delete=models.CASCADE, related_name="vet_requests"
     )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Requested')
+    caregiver = models.ForeignKey(
+        User,
+        limit_choices_to={"role": "Caregiver"},
+        on_delete=models.CASCADE,
+        related_name="caregiver_requests",
+    )
+    veterinarian = models.ForeignKey(
+        User,
+        limit_choices_to={"role": "Veterinarian"},
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vet_requests",
+    )
+    request_date = models.DateField(auto_now_add=True)
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.REQUESTED
+    )
     examination_date = models.DateTimeField(null=True, blank=True)
     result = models.TextField(null=True, blank=True)
 

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}User List{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>User List</h2>
+
+    <a href="{% url 'user_create' %}">Create new user</a>
+
+    <form method="post" action="{% url 'users_list' %}">
+        {% csrf_token %}
+        <div class="row mb-3">
+            <div class="col">
+                <input type="text" name="first_name" value="{{ first_name }}" placeholder="Search by first name"
+                    class="form-control">
+            </div>
+            <div class="col">
+                <input type="text" name="last_name" value="{{ last_name }}" placeholder="Search by last name"
+                    class="form-control">
+            </div>
+            <div class="col">
+                <input type="text" name="email" value="{{ email }}" placeholder="Search by email" class="form-control">
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-secondary" type="submit" name="search" value="search">Search</button>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="select-all"></th>
+                    <th><a href="?sort=username">Username</a></th>
+                    <th><a href="?sort=first_name">First Name</a></th>
+                    <th><a href="?sort=last_name">Last Name</a></th>
+                    <th><a href="?sort=email">Email</a></th>
+                    <th><a href="?sort=phone_number">Contact</a></th>
+                    <th><a href="?sort=role">Role</a></th>
+                    <th><a href="?sort=is_active">Deactivated</a></th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td><input type="checkbox" name="selected_users" value="{{ user.id }}"></td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.first_name }}</td>
+                    <td>{{ user.last_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.contact }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>{{ user.is_active|yesno:"No,Yes" }}</td>
+                    <td>
+                        <a href="{% url 'user_detail' id=user.id %}">
+                            DETAIL
+                        </a>
+                        <a href="{% url 'user_edit' id=user.id %}" title="Edit User">
+                            EDIT
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-between">
+            <button type="submit" name="delete" value="delete" class="btn btn-danger">Delete</button>
+            <button type="submit" name="change_role" value="change_role" class="btn btn-warning">Change Role</button>
+            <button type="submit" name="activate" value="activate" class="btn btn-success">Activate</button>
+            <button type="submit" name="deactivate" value="deactivate" class="btn btn-secondary">Deactivate</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
