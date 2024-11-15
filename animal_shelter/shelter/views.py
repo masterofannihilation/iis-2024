@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Animal, Walk, VeterinarianRequest
+from .models import Animal, Walk, VeterinarianRequest, User
 
 
 # Home page
@@ -11,7 +11,6 @@ def home_page(request):
 def animals_list(request):
     animals = Animal.objects.all()
     return render(request, "animals/list.html", {"animals": animals})
-
 
 # View for scheduling walks
 def walks_list(request):
