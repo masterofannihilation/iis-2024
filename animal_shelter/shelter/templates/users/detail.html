@@ -12,8 +12,18 @@
 
 {% if profile_page %}
 <a href="{% url 'profile_edit' %}">Edit</a>
+<a href="{% url 'change_password' %}">Change password</a>
 {% else %}
 <a href="{% url 'user_edit' id=user.id %}">Edit</a>
+<a href="{% url 'reset_password' id=user.id %}">Reset password</a>
+{% endif %}
+
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li class="alert alert-{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
 {% endif %}
 
 {% endblock %}

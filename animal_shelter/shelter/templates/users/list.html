@@ -31,7 +31,14 @@
             <thead>
                 <tr>
                     <th><input type="checkbox" id="select-all"></th>
-                    <th><a href="?sort=username">Username</a></th>
+                    <th>Username<button type="submit" name="sort_by"
+                            value="{% if sort_by == 'username' %}DESCENDING_{% endif %}username">
+                            {% if sort_by == 'username' %}
+                            <i class="bi bi-caret-down"></i>
+                            {% else %}
+                            <i class="bi bi-caret-up"></i>
+                            {% endif %}
+                        </button></th>
                     <th><a href="?sort=first_name">First Name</a></th>
                     <th><a href="?sort=last_name">Last Name</a></th>
                     <th><a href="?sort=email">Email</a></th>
@@ -44,7 +51,8 @@
             <tbody>
                 {% for user in users %}
                 <tr>
-                    <td><input type="checkbox" name="selected_users" value="{{ user.id }}"></td>
+                    <td><input type="checkbox" name="selected_users" value="{{ user.id }}"
+                        {% if not user.modifiable%}disabled{% endif %}></td>
                     <td>{{ user.username }}</td>
                     <td>{{ user.first_name }}</td>
                     <td>{{ user.last_name }}</td>
@@ -54,10 +62,10 @@
                     <td>{{ user.is_active|yesno:"No,Yes" }}</td>
                     <td>
                         <a href="{% url 'user_detail' id=user.id %}">
-                            DETAIL
+                            <i class="bi bi-eye"></i>
                         </a>
                         <a href="{% url 'user_edit' id=user.id %}" title="Edit User">
-                            EDIT
+                            <i class="bi bi-pencil-fill"></i>
                         </a>
                     </td>
                 </tr>
@@ -66,10 +74,25 @@
         </table>
         <div class="d-flex justify-content-between">
             <button type="submit" name="delete" value="delete" class="btn btn-danger">Delete</button>
+            <select class="form-select" id="role" name="role">
+                <option value="">Choose a role...</option>
+                <option value="Administrator">Administrator</option>
+                <option value="Caregiver">Caregiver</option>
+                <option value="Veterinarian">Veterinarian</option>
+                <option value="Volunteer">Volunteer</option>
+            </select>
             <button type="submit" name="change_role" value="change_role" class="btn btn-warning">Change Role</button>
             <button type="submit" name="activate" value="activate" class="btn btn-success">Activate</button>
             <button type="submit" name="deactivate" value="deactivate" class="btn btn-secondary">Deactivate</button>
         </div>
     </form>
+
+    {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li class="alert alert-{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
 </div>
 {% endblock %}
