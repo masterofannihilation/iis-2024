@@ -10,6 +10,14 @@ class User(AbstractUser):
         VETERINARIAN = "Veterinarian", "Veterinarian"
         VOLUNTEER = "Volunteer", "Volunteer"
 
+        @staticmethod
+        def from_string(s: str) -> "User.Role":
+            for r in User.Role.choices:
+                if r[1] == s:
+                    return r[0]
+
+            raise ValueError(f"{s} is not a valid role name")
+
     role = models.CharField(
         max_length=20,
         choices=Role.choices,  # Use the enumeration here
@@ -24,15 +32,16 @@ class User(AbstractUser):
         "auth.Permission", related_name="shelter_user_set", blank=True
     )
 
-    def is_authorized(self, min_role: Role) -> bool:
+    def is_authorized_enough(self, min_role: Role) -> bool:
         order = (
             User.Role.ADMINISTRATOR,
             User.Role.CAREGIVER,
             User.Role.VETERINARIAN,
             User.Role.VOLUNTEER,
         )
+        # the lower the index the higher the privileges
         min_role_idx = order.index(min_role)
-        self_role_idx = order.index(self)
+        self_role_idx = order.index(self.role)
         return self_role_idx <= min_role_idx
 
     def __str__(self):
