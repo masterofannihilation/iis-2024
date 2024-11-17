@@ -7,17 +7,25 @@ def home_page(request):
     return render(request, "home.html")
 
 
-# List all animals
 def animals_list(request):
-    query = Animal.objects.all()
-    name = request.GET.get('name', '')
-    species = request.GET.get('species', '')
-    if name:
-        query = query.filter(name__icontains=name)
-    if species:
-        query = query.filter(species=species)
-    animals = query
-    return render(request, "animals/list.html", {"animals": animals})
+    animals = Animal.objects.all()
+
+    species_list = Animal.objects.values_list('species', flat=True).distinct()
+
+    name_filter = request.GET.get('name', '')
+    species_filter = request.GET.get('species', '')
+
+    if name_filter:
+        animals = animals.filter(name__icontains=name_filter)
+
+    if species_filter:
+        animals = animals.filter(species=species_filter)
+
+    return render(request, 'animals/list.html', {
+        'animals': animals,
+        'species_list': species_list
+    })
+
 
 # View for scheduling walks
 def walks_list(request):
