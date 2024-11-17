@@ -1,6 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+{% load permissions %}
 <h1>Animals</h1>
+<form method="get">
+    <input type="text" name="name" placeholder="Search by name">
+    <select name="species">
+        <option value="">All Species</option>
+        <option value="Dog">Dog</option>
+        <option value="Cat">Cat</option>
+        <option value="Rabbit">Rabbit</option>
+        <option value="Other">Other</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
 <ul>
     {% for animal in animals %}
-        <li>{{ animal.name }} - {{ animal.species }} - {{ animal.age }} years old</li>
+    <li>
+        <a href="{% url 'animal_detail' animal.id %}">{{ animal.name }}</a>
+        ({{ animal.species }})
+    </li>
     {% endfor %}
 </ul>
+{% if user.is_authenticated and user|can_manage_animals %}
+<a href="{% url 'animal_create' %}" class="btn btn-success">Add Animal</a>
+{% endif %}
+{% endblock %}

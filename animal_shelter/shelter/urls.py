@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .users import views as user_views
+from .animals import views as animal_views
 from django.contrib.auth.views import LoginView, LogoutView
 
 urlpatterns = [
@@ -16,5 +17,9 @@ urlpatterns = [
     path('users/<int:id>/edit/', user_views.user_edit, name='user_edit'),
     path('users/<int:id>/pwd-reset', user_views.reset_password, name='reset_password'),
     path('users/create/', user_views.user_create, name='user_create'),
+    path('animals/create/', animal_views.animal_create, name='animal_create'),
+    path('animals/<int:id>/', animal_views.animal_detail, name='animal_detail'),
+    path('animals/<int:id>/edit/', animal_views.animal_edit, name='animal_edit'),
+    path('animals/<int:id>/delete/', animal_views.animal_delete, name='animal_delete'),
     path('walks/', views.walks_list, name='walks_list'),
 ]

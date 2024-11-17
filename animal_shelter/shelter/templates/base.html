@@ -20,6 +20,7 @@
                 {% if logged_in_user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'users_list' %}">Users</a>
+                    <a class="nav-link" href="{% url 'animals_list' %}">Animals</a>
                 </li>
                 {% endif %}
                 <li class="nav-item">
