@@ -1,12 +1,11 @@
 from typing import Optional
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.decorators.http import require_POST
 from .actions import ActionOverUsers
 from ..models import User
 from django.contrib.auth.decorators import login_required
-from .list import UserListModel, UserFilterArgs
+from .list import TableHeader, UserListModel, UserFilterArgs
 from django.http.request import HttpRequest
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, QueryDict
 from django.forms import ModelForm, CheckboxInput, Select, ValidationError
 from django.contrib.auth import logout
 from django.contrib.auth.forms import PasswordChangeForm
@@ -50,11 +49,19 @@ class ProfileEditForm(ModelForm):
         fields = ["email", "contact_info"]
 
 
+def _copy_query_params(query: QueryDict, exclude: list[str] = []) -> QueryDict:
+    copied = query.copy()
+    copied._mutable = True
+    for q in exclude:
+        copied.pop(q, "")
+    return copied
+
+
 def min_user_privileges(
     request: HttpRequest, min_role: User.Role
 ) -> Optional[HttpResponseForbidden]:
     user: User = request.user  # type: ignore
-    if not user.is_authorized_enough(User.Role.CAREGIVER):
+    if not user.is_authorized_enough(min_role):
         return HttpResponseForbidden("Access Denied: Insufficient privileges.")
 
 
@@ -67,45 +74,54 @@ def users_list(request: HttpRequest):
 
     context = {}
 
-    users = None
+    context["is_admin"] = request.user.role == User.Role.ADMINISTRATOR  # type: ignore
+
+    users_page = None
+    sort_by_query = ""
+    last_descending = False
     if request.method == "POST":
-        context["first_name"] = request.POST.get("first_name", "")
-        context["last_name"] = request.POST.get("last_name", "")
-        context["email"] = request.POST.get("email", "")
-        context["sort_by"] = request.POST.get("sort_by", "")
-        if "search" in request.POST or "sort_by" in request.POST:
-            fa = UserFilterArgs.from_method_query(request.POST)
-            users = UserListModel.search(filter=fa, viewer=request.user)  # type: ignore
+        selected_users = request.POST.getlist("selected_users")
+        selected_ids = list(map(int, selected_users))
+        action = ActionOverUsers(request.user)  # type: ignore
+        result = None
+        if "activate" in request.POST:
+            result = action.set_active_state(True, selected_ids)
+        elif "deactivate" in request.POST:
+            result = action.set_active_state(False, selected_ids)
+        elif "delete" in request.POST:
+            result = action.delete(selected_ids)
+        elif "change_role":
+            changed_role_str = request.POST.get("role")
+            if changed_role_str:
+                changed_role = None
+                try:
+                    changed_role = User.Role.from_string(changed_role_str)
+                except ValueError:
+                    action.result = False
+                    action.msg = f"Choose role!"
+                    pass
+                if changed_role:
+                    result = action.change_role(changed_role, selected_ids)
+        if action.was_successful():
+            messages.success(request, action.msg)
         else:
-            selected_users = request.POST.getlist("selected_users")
-            selected_ids = list(map(int, selected_users))
-            action = ActionOverUsers(request.user)  # type: ignore
-            result = None
-            if "activate" in request.POST:
-                result = action.set_active_state(True, selected_ids)
-            elif "deactivate" in request.POST:
-                result = action.set_active_state(False, selected_ids)
-            elif "delete" in request.POST:
-                result = action.delete(selected_ids)
-            elif "change_role":
-                changed_role_str = request.POST.get("role")
-                if changed_role_str:
-                    changed_role = None
-                    try:
-                        changed_role = User.Role.from_string(changed_role_str)
-                    except ValueError:
-                        pass
-                    if changed_role:
-                        result = action.change_role(changed_role, selected_ids)
-            if isinstance(result, HttpResponseForbidden):
-                return result
-            fa = UserFilterArgs.from_method_query(request.POST)
-            users = UserListModel.search(filter=fa, viewer=request.user)  # type: ignore
+            messages.error(request, action.msg)
+        users_page = UserListModel.search(viewer=request.user)  # type: ignore
+    else:  # GET method
+        fa = UserFilterArgs.from_method_query(request.GET)
+        users_page = UserListModel.search(filter_args=fa, viewer=request.user)  # type: ignore
+        sort_by_query = fa.sort_by if fa.sort_by else ""
+        last_descending = request.GET.get("descending", "0") != "0"
 
-    if users is None:
-        users = UserListModel.search(viewer=request.user)  # type: ignore
+        context["filters_page"] = _copy_query_params(request.GET, ["page"])
+        context["filters_sort"] = _copy_query_params(
+            request.GET, ["sort_by", "descending"]
+        )
 
-    context["users"] = users
+    context["page_obj"] = users_page[0]
+    context["users"] = users_page[1]
+
+    context["headers"] = TableHeader.default(sort_by_query, last_descending)
 
     return render(request, "users/list.html", context)
 
