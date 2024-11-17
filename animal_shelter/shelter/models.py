@@ -1,3 +1,4 @@
+from typing import Optional
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -17,6 +18,14 @@ class User(AbstractUser):
                     return r[0]
 
             raise ValueError(f"{s} is not a valid role name")
+
+        @staticmethod
+        def from_string_safe(s: str) -> Optional["User.Role"]:
+            for r in User.Role.choices:
+                if r[1] == s:
+                    return r[0]
+
+            return None
 
     role = models.CharField(
         max_length=20,

@@ -17,6 +17,8 @@ def generate_password() -> str:
 class ActionOverUsers:
     def __init__(self, requested_by: User) -> None:
         self.requested_by = requested_by
+        self.result = None
+        self.msg: str = "No action has been made."
 
     def _can_modify(self, modified_user: User) -> bool:
         if self.requested_by == modified_user:
@@ -40,7 +42,11 @@ class ActionOverUsers:
         users = self._retrieve_users(ids)
         for u in users:
             if not self._can_modify(u):
-                return HttpResponseForbidden("Access Denied: Insufficient privileges.")
+                self.result = HttpResponseForbidden(
+                    "Access Denied: Insufficient privileges."
+                )
+                self.msg = "Access Denied: Insufficient privileges."
+                return self.result
         return users
 
     def set_active_state(
@@ -54,6 +60,10 @@ class ActionOverUsers:
             u.is_active = set_active
             u.save()
 
+        self.result = True
+        state_str = "active" if set_active else "deactivated"
+        self.msg = f"Changed status of {len(users)} users to {state_str}."
+
     def delete(self, ids: list[int]) -> Optional[HttpResponseForbidden]:
         users = self._retrieve_and_authorize(ids)
         if isinstance(users, HttpResponseForbidden):
@@ -62,12 +72,16 @@ class ActionOverUsers:
         for u in users:
             u.delete()
 
+        self.result = True
+        self.msg = f"Deleted {len(users)} users."
+
     def change_role(
         self, role: User.Role, ids: list[int]
     ) -> Optional[HttpResponseForbidden]:
         users = self._retrieve_and_authorize(ids)
         if isinstance(users, HttpResponseForbidden):
-            return users
+            self.result = users
+            return self.result
 
         if self.requested_by.role != User.Role.ADMINISTRATOR:
             return HttpResponseForbidden("Access Denied: Insufficient privileges.")
@@ -75,6 +89,9 @@ class ActionOverUsers:
         for u in users:
             u.role = role
             u.save()
+
+        self.result = True
+        self.msg = f"Changed role of {len(users)} users to {role}."
 
     def reset_password(
         self, ids: list[int]
@@ -90,4 +107,9 @@ class ActionOverUsers:
             u.save()
             result.append((u, new_pwd))
 
+        self.result = True
+        self.msg = f"Reset password of {len(users)} users."
         return result
+
+    def was_successful(self) -> bool:
+        return self.result is True

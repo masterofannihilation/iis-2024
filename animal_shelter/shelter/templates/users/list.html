@@ -8,44 +8,66 @@
 
     <a href="{% url 'user_create' %}">Create new user</a>
 
-    <form method="post" action="{% url 'users_list' %}">
+    <form method="get">
         {% csrf_token %}
         <div class="row mb-3">
             <div class="col">
-                <input type="text" name="first_name" value="{{ first_name }}" placeholder="Search by first name"
+                <input type="text" name="username" value="{{ filters_page.username }}" placeholder="Search by username"
                     class="form-control">
             </div>
             <div class="col">
-                <input type="text" name="last_name" value="{{ last_name }}" placeholder="Search by last name"
+                <input type="text" name="first_name" value="{{ filters_page.first_name }}" placeholder="Search by first name"
                     class="form-control">
             </div>
             <div class="col">
-                <input type="text" name="email" value="{{ email }}" placeholder="Search by email" class="form-control">
+                <input type="text" name="last_name" value="{{ filters_page.last_name }}" placeholder="Search by last name"
+                    class="form-control">
+            </div>
+            <div class="col">
+                <input type="text" name="email" value="{{ filters_page.email }}" placeholder="Search by email" class="form-control">
+            </div>
+            <div class="col">
+                <select class="form-select" id="filter_role" name="filter_role">
+                    <option value="">Filter by role</option>
+                    <option value="Administrator"{% if filters_page.filter_role == "Administrator" %}selected{% endif %}>Administrator</option>
+                    <option value="Caregiver"{% if filters_page.filter_role == "Caregiver" %}selected{% endif %}>Caregiver</option>
+                    <option value="Veterinarian"{% if filters_page.filter_role == "Veterinarian" %}selected{% endif %}>Veterinarian</option>
+                    <option value="Volunteer"{% if filters_page.filter_role == "Volunteer" %}selected{% endif %}>Volunteer</option>
+                </select>    
             </div>
             <div class="col">
                 <button class="btn btn-outline-secondary" type="submit" name="search" value="search">Search</button>
             </div>
         </div>
+    </form>
 
+    <form method="post">
+        {% csrf_token %}
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th><input type="checkbox" id="select-all"></th>
-                    <th>Username<button type="submit" name="sort_by"
-                            value="{% if sort_by == 'username' %}DESCENDING_{% endif %}username">
-                            {% if sort_by == 'username' %}
-                            <i class="bi bi-caret-down"></i>
+                    {% for header in headers %}
+                    <th>
+                        {{ header.text }}
+                        {% if header.sorting_on %}
+                            {% if header.active_sorting %}
+                                {% if header.descending_shown %}
+                                <a href="?sort_by={{ header.sort_by }}&descending=0&{{ filters_sort.urlencode }}">
+                                    <i class="bi bi-caret-down-fill"></i>
+                                </a>
+                                {% else %}
+                                <a href="?sort_by={{ header.sort_by }}&descending=1&{{ filters_sort.urlencode }}">
+                                    <i class="bi bi-caret-up-fill"></i>
+                                </a>
+                                {% endif %}
                             {% else %}
-                            <i class="bi bi-caret-up"></i>
+                            <a href="?sort_by={{ header.sort_by }}&descending=0&{{ filters_sort.urlencode }}">
+                                <i class="bi bi-caret-up"></i>
+                            </a>
                             {% endif %}
-                        </button></th>
-                    <th><a href="?sort=first_name">First Name</a></th>
-                    <th><a href="?sort=last_name">Last Name</a></th>
-                    <th><a href="?sort=email">Email</a></th>
-                    <th><a href="?sort=phone_number">Contact</a></th>
-                    <th><a href="?sort=role">Role</a></th>
-                    <th><a href="?sort=is_active">Deactivated</a></th>
-                    <th>Actions</th>
+                        {% endif %}
+                    </th>
+                    {% endfor %}
                 </tr>
             </thead>
             <tbody>
@@ -59,21 +81,23 @@
                     <td>{{ user.email }}</td>
                     <td>{{ user.contact }}</td>
                     <td>{{ user.role }}</td>
-                    <td>{{ user.is_active|yesno:"No,Yes" }}</td>
+                    <td>{{ user.is_active|yesno:"Yes, No" }}</td>
                     <td>
                         <a href="{% url 'user_detail' id=user.id %}">
                             <i class="bi bi-eye"></i>
                         </a>
+                        {% if user.modifiable %}
                         <a href="{% url 'user_edit' id=user.id %}" title="Edit User">
                             <i class="bi bi-pencil-fill"></i>
                         </a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         <div class="d-flex justify-content-between">
-            <button type="submit" name="delete" value="delete" class="btn btn-danger">Delete</button>
+            {% if logged_in_admin %}
             <select class="form-select" id="role" name="role">
                 <option value="">Choose a role...</option>
                 <option value="Administrator">Administrator</option>
@@ -82,10 +106,21 @@
                 <option value="Volunteer">Volunteer</option>
             </select>
             <button type="submit" name="change_role" value="change_role" class="btn btn-warning">Change Role</button>
+            {% endif %}
             <button type="submit" name="activate" value="activate" class="btn btn-success">Activate</button>
             <button type="submit" name="deactivate" value="deactivate" class="btn btn-secondary">Deactivate</button>
+            <button type="submit" name="delete" value="delete" class="btn btn-danger">Delete</button>
         </div>
     </form>
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&{{ filters_page.urlencode }}">&laquo; Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&{{ filters_page.urlencode }}">Next &raquo;</a>
+        {% endif %}
+    </div>
 
     {% if messages %}
         <ul>
