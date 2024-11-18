@@ -292,4 +292,16 @@ USER_SEEDS: list[tuple[User, str]] = [
         ),
         NAIVE_PASSWORD,
     ),
+    (
+        User(
+            id=1_001_020,
+            username="johnDoe",
+            first_name="John",
+            last_name="Doe",
+            email="jdoe@outlook.edu",
+            contact_info="124-77895",
+            role=User.Role.VOLUNTEER,
+        ),
+        "password",
+    ),
 ]

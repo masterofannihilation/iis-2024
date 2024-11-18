@@ -69,6 +69,7 @@ class Animal(models.Model):
     date_of_birth = models.DateField()
     description = models.TextField()
     intake_date = models.DateField()
+    image_url = models.URLField(max_length=500, blank=True, null=True)
 
     def __str__(self):
         return self.name

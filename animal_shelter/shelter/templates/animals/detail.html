@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+{% load permissions %}
+<h1>{{ animal.name }}</h1>
+<p><strong>Species:</strong> {{ animal.species }}</p>
+<p><strong>Date of Birth:</strong> {{ animal.date_of_birth }}</p>
+<p><strong>Description:</strong> {{ animal.description }}</p>
+<p><strong>Intake Date:</strong> {{ animal.intake_date }}</p>
+
+{% if user.is_authenticated and user|can_manage_animals %}
+    <a href="{% url 'animal_edit' animal.id %}" class="btn btn-warning">Edit</a>
+    <form method="post" action="{% url 'animal_delete' animal.id %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+{% endif %}
+
+{% endblock %}
