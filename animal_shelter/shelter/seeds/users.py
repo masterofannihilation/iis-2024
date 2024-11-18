@@ -53,7 +53,7 @@ USER_SEEDS: list[tuple[User, str]] = [
     ),
     (
         User(
-            id=1_001_005,
+            id=1_001_020,
             username="johnDoe",
             first_name="John",
             last_name="Doe",

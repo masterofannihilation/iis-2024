@@ -9,6 +9,7 @@ ANIMAL_SEEDS = (
         date_of_birth=datetime.date(2019, 1, 1),
         description="Former police dog.",
         intake_date=datetime.date(2023, 11, 1),
+        image_url="",
     ),
     Animal(
         id=1_002_001,
@@ -17,6 +18,7 @@ ANIMAL_SEEDS = (
         date_of_birth=datetime.date(2020, 6, 15),
         description="Orange cat, what more needs to be said.",
         intake_date=datetime.date(2023, 10, 20),
+        image_url="https://www.rockthecatspa.com/uploads/1/1/5/5/115599245/img-20231006-102509-3_orig.jpg",
     ),
     Animal(
         id=1_002_002,
@@ -25,6 +27,7 @@ ANIMAL_SEEDS = (
         date_of_birth=datetime.date(2021, 3, 10),
         description="Friendly rabbit with soft white fur.",
         intake_date=datetime.date(2023, 9, 15),
+        image_url="https://www.thesprucepets.com/thmb/vzltd7pkVDEWU6qR8z8hWgQA0yo=/3558x0/filters:no_upscale():strip_icc()/sergio-arze-jWjqMOQOHr0-unsplash-c7e69cbbfe7e4e159efd9d9deb5daff1.jpg",
     ),
     Animal(
         id=1_002_003,
@@ -33,6 +36,7 @@ ANIMAL_SEEDS = (
         date_of_birth=datetime.date(2018, 12, 25),
         description="Calm and loyal German Shepherd mix.",
         intake_date=datetime.date(2023, 8, 10),
+        image_url="https://www.allthingsdogs.com/wp-content/uploads/2022/05/australianshepherdgermanshepherdmix1.png",
     ),
     Animal(
         id=1_002_004,
@@ -41,6 +45,7 @@ ANIMAL_SEEDS = (
         date_of_birth=datetime.date(2021, 11, 5),
         description="Shy but affectionate Persian cat.",
         intake_date=datetime.date(2023, 7, 5),
+        image_url="https://pangovet.com/wp-content/uploads/2024/06/persian-cat-in-grass_Cattrall-shutterstock-e1666280664132.jpg",
     ),
     Animal(
         id=1_002_005,
@@ -49,6 +54,7 @@ ANIMAL_SEEDS = (
         date_of_birth=datetime.date(2022, 4, 2),
         description="Active rabbit who loves to explore.",
         intake_date=datetime.date(2023, 6, 18),
+        image_url="https://images.saymedia-content.com/.image/t_share/MTc0OTY5NzMyNzY3NDkyMDY0/best-pet-rabbit-breeds.png",
     ),
     Animal(
         id=1_002_006,
@@ -57,6 +63,7 @@ ANIMAL_SEEDS = (
         date_of_birth=datetime.date(2019, 9, 8),
         description="Calico cat with a distinctive coat pattern.",
         intake_date=datetime.date(2023, 5, 25),
+        image_url="https://pangovet.com/wp-content/uploads/2024/06/calico-cat-sitting-outdoor_Karen-Kaspar-Shutterstock.jpg",
     ),
     Animal(
         id=1_002_007,
@@ -65,6 +72,7 @@ ANIMAL_SEEDS = (
         date_of_birth=datetime.date(2020, 2, 14),
         description="Energetic Jack Russell Terrier mix.",
         intake_date=datetime.date(2023, 4, 10),
+        image_url="https://www.ocregister.com/wp-content/uploads/migration/l7m/l7ml47-b78680484z.120100823145827000gc2pvj87.1.jpg?w=535",
     ),
     Animal(
         id=1_002_008,
@@ -73,5 +81,6 @@ ANIMAL_SEEDS = (
         date_of_birth=datetime.date(2021, 8, 22),
         description="Gentle rabbit with light brown fur.",
         intake_date=datetime.date(2023, 3, 5),
+        image_url="https://bosworthbunnies.weebly.com/uploads/1/1/8/1/118146189/img-0179_orig.jpeg",
     ),
 )

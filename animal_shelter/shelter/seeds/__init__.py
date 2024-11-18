@@ -6,7 +6,6 @@ def seed_demo_data():
     for table in tables:
         table.objects.all().delete()
 
-
     from .users import USER_SEEDS
 
     for user in USER_SEEDS:

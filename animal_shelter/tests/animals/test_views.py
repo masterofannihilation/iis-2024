@@ -33,7 +33,9 @@ class AnimalTestBase(TestCase):
 
 class TestAnimalDetail(AnimalTestBase):
     def veriy_view(self):
-        response = self.client.get(reverse("animal_detail", args=[animals.ANIMAL_SEEDS[0].id]))
+        response = self.client.get(
+            reverse("animal_detail", args=[animals.ANIMAL_SEEDS[0].id])
+        )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, animals.ANIMAL_SEEDS[0].name)
 
@@ -55,8 +57,11 @@ class TestAnimalDetail(AnimalTestBase):
 
     def test_guest_cant_view_animal_detail(self):
         self.client.logout()
-        response = self.client.get(reverse("animal_detail", args=[animals.ANIMAL_SEEDS[0].id]))
-        self.assertEqual(response.status_code, 302) #Redirect to login page
+        response = self.client.get(
+            reverse("animal_detail", args=[animals.ANIMAL_SEEDS[0].id])
+        )
+        self.assertEqual(response.status_code, 302)  # Redirect to login page
+
 
 class TestAnimalCreate(AnimalTestBase):
     def create_animal(self):
@@ -65,7 +70,7 @@ class TestAnimalCreate(AnimalTestBase):
             "species": "Cat",
             "date_of_birth": "2019-06-15",
             "description": "Calm and affectionate",
-            "intake_date": "2023-11-10"
+            "intake_date": "2023-11-10",
         }
         return self.client.post(reverse("animal_create"), data)
 
@@ -103,22 +108,25 @@ class TestAnimalEdit(AnimalTestBase):
             "species": "Cat",
             "date_of_birth": "2020-06-15",
             "description": "Updated description",
-            "intake_date": "2023-10-20"
+            "intake_date": "2023-10-20",
         }
-        return self.client.post(reverse("animal_edit", args=[animals.ANIMAL_SEEDS[1].id]), data)
+        return self.client.post(
+            reverse("animal_edit", args=[animals.ANIMAL_SEEDS[1].id]), data
+        )
 
     def edit_success(self):
         response = self.edit_animal()
         self.assertEqual(response.status_code, 302)
 
-        response = self.client.get(reverse("animal_detail", args=[animals.ANIMAL_SEEDS[1].id]))
+        response = self.client.get(
+            reverse("animal_detail", args=[animals.ANIMAL_SEEDS[1].id])
+        )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Updated description")
 
     def edit_unauth(self):
         response = self.edit_animal()
         self.assertEqual(response.status_code, 403)
-
 
     def test_admin_can_edit_animal(self):
         self.login_as(self.admin)
@@ -139,12 +147,16 @@ class TestAnimalEdit(AnimalTestBase):
 
 class TestAnimalDelete(AnimalTestBase):
     def delete_success(self):
-        response = self.client.post(reverse("animal_delete", args=[animals.ANIMAL_SEEDS[1].id]))
+        response = self.client.post(
+            reverse("animal_delete", args=[animals.ANIMAL_SEEDS[1].id])
+        )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Animal.objects.count(), len(animals.ANIMAL_SEEDS) - 1)
 
     def delete_unauth(self):
-        response = self.client.post(reverse("animal_delete", args=[animals.ANIMAL_SEEDS[1].id]))
+        response = self.client.post(
+            reverse("animal_delete", args=[animals.ANIMAL_SEEDS[1].id])
+        )
         self.assertEqual(response.status_code, 403)
         self.assertEqual(Animal.objects.count(), len(animals.ANIMAL_SEEDS))
 

@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 {% load permissions %}
+{% load static %}
+
 <h1>Animals</h1>
+
+<!-- Filter Form -->
 <form method="get">
-    <input type="text" name="name" placeholder="Search by name">
+    <input type="text" name="name" placeholder="Search by name" value="{{ request.GET.name }}">
     <select name="species">
         <option value="">All Species</option>
         {% for species in species_list %}
@@ -11,18 +15,56 @@
         {% endfor %}
     </select>
     <button type="submit" class="btn btn-primary">Filter</button>
+
+    <!-- Add animal -->
+    {% if user.is_authenticated and user|can_manage_animals %}
+        <a href="{% url 'animal_create' %}" class="btn btn-success">Add Animal</a>
+    {% endif %}
 </form>
 
-<ul>
+<div class="animal-list">
     {% for animal in animals %}
-    <li>
-        <a href="{% url 'animal_detail' animal.id %}">{{ animal.name }}</a>
-        ({{ animal.species }})
-    </li>
-    {% endfor %}
-</ul>
+        <div class="animal-item d-flex align-items-center mb-4 p-3 border rounded">
+            <!-- Clickable region -->
+            <a href="{% url 'animal_detail' animal.id %}" class="d-flex flex-grow-1 align-items-center text-decoration-none">
+                <!-- Image -->
+                <div class="animal-image-container align-self-center">
+                    <img src="{% if animal.image_url %}{{ animal.image_url }}{% else %}{% static 'images/default_animal.png' %}{% endif %}"
+                         alt="{{ animal.name }}"
+                         class="animal-image"
+                         style="width: 100px; height: 100px; object-fit: cover;">
+                </div>
 
-{% if user.is_authenticated and user|can_manage_animals %}
-<a href="{% url 'animal_create' %}" class="btn btn-success">Add Animal</a>
-{% endif %}
+                <!-- Details -->
+                <div class="animal-details ms-4">
+                    <h3 class="text-dark mb-0" style="line-height: 1.2;">{{ animal.name }}</h3>
+                    <p class="text-muted mt-1 mb-0">{{ animal.description }}</p>
+                </div>
+            </a>
+
+            <!-- Buttons -->
+            {% if user.is_authenticated%}
+                <div class="animal-actions ms-3">
+                    {% if user|is_volunteer %}
+                        <a href="#" class="btn btn-info btn-sm">Schedule a walk</a>
+
+                    {% elif user|is_vet %}
+                        <a href="#" class="btn btn-info btn-sm">Health records</a>
+
+                    {% elif user|can_manage_animals %}
+                    <a href="#" class="btn btn-info btn-sm">Walk schedule</a>
+                    <a href="#" class="btn btn-info btn-sm">Vet requests</a>
+                    <a href="{% url 'animal_edit' animal.id %}" class="btn btn-warning btn-sm">Edit</a>
+
+                    <form method="post" action="{% url 'animal_delete' animal.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+
 {% endblock %}

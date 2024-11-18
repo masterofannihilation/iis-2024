@@ -5,13 +5,14 @@ from ..models import Animal, User
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 
+
 class AnimalForm(ModelForm):
     class Meta:
         model = Animal
-        fields = ['name', 'species', 'date_of_birth', 'description', 'intake_date']
+        fields = ["name", "species", "date_of_birth", "description", "intake_date"]
         widgets = {
-            'date_of_birth': DateInput(attrs={'type': 'date'}),
-            'intake_date': DateInput(attrs={'type': 'date'}),
+            "date_of_birth": DateInput(attrs={"type": "date"}),
+            "intake_date": DateInput(attrs={"type": "date"}),
         }
 
 
@@ -21,47 +22,68 @@ def user_can_manage_animals(view_func):
         if not request.user.role in [User.Role.CAREGIVER, User.Role.ADMINISTRATOR]:
             return HttpResponseForbidden("Access Denied: Insufficient privileges.")
         return view_func(request, *args, **kwargs)
+
     return wrapper
+
+
+def animals_list(request):
+    animals = Animal.objects.all()
+
+    species_list = Animal.objects.values_list("species", flat=True).distinct()
+
+    name_filter = request.GET.get("name", "")
+    species_filter = request.GET.get("species", "")
+
+    if name_filter:
+        animals = animals.filter(name__icontains=name_filter)
+
+    if species_filter:
+        animals = animals.filter(species=species_filter)
+
+    return render(
+        request, "animals/list.html", {"animals": animals, "species_list": species_list}
+    )
+
 
 @login_required
 @user_can_manage_animals
 def animal_create(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AnimalForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('animals_list')
+            return redirect("animals_list")
 
     else:
         form = AnimalForm()
-    return render(request, 'animals/create.html', {'form': form})
+    return render(request, "animals/create.html", {"form": form})
 
 
 @login_required
 def animal_detail(request, id):
     animal = get_object_or_404(Animal, id=id)
-    return render(request, 'animals/detail.html', {'animal': animal})
+    return render(request, "animals/detail.html", {"animal": animal})
 
 
 @login_required
 @user_can_manage_animals
 def animal_edit(request, id):
     animal = get_object_or_404(Animal, id=id)
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AnimalForm(request.POST, instance=animal)
         if form.is_valid():
             form.save()
-            return redirect('animal_detail', id=id)
+            return redirect("animal_detail", id=id)
     else:
         form = AnimalForm(instance=animal)
-    return render(request, 'animals/edit.html', {'form': form, 'animal': animal})
+    return render(request, "animals/edit.html", {"form": form, "animal": animal})
 
 
 @login_required
 @user_can_manage_animals
 def animal_delete(request, id):
     animal = get_object_or_404(Animal, id=id)
-    if request.method == 'POST':
+    if request.method == "POST":
         animal.delete()
-        return redirect('animals_list')
-    return render(request, 'animals/delete.html', {'animal': animal})
+        return redirect("animals_list")
+    return render(request, "animals/delete.html", {"animal": animal})
