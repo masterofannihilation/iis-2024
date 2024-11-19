@@ -4,9 +4,15 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+###############################################################################
+### Deployment related settings
+###############################################################################
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+# Set these environment variables on production server!!!
+# SECRET_KEY=<secure_key>
+# DEBUG=False
+# ALLOWED_HOSTS=<domain_of_the_web_service>
+# SEED_USER_PWD=<default_password_of_seeded_users>
 
 # Set SECRET_KEY in production!
 _development_key = "django-insecure-$(!hr+2ddrbr^o75u5q0d(8immx-jfcmg)##o7mh4j3%h%^_bx"
@@ -20,8 +26,24 @@ _hosts_list = os.getenv("ALLOWED_HOSTS", None)
 if _hosts_list:
     ALLOWED_HOSTS = _hosts_list.split(",")
 
+if not DEBUG:
+    # Enforce HTTPS communication
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
-# Application definition
+    # Always redirect to HTTPS
+    SECURE_SSL_REDIRECT = True
+
+    # Transmit cookies only over HTTPS
+    SESSION_COOKIE_SECURE = True
+
+    # Against Cross-Site Request Forgery
+    CSRF_COOKIE_SECURE = True
+
+###############################################################################
+### Application definition
+###############################################################################
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -35,6 +57,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -118,12 +141,15 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "animal_shelter/static"),
 ]
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 SEED_DEMO_DATA = True
+SEED_USER_PWD = os.getenv("SEED_USER_PWD", "password")
 
 AUTH_USER_MODEL = "shelter.User"
 LOGIN_URL = "/login/"
