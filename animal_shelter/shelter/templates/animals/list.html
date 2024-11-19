@@ -6,65 +6,70 @@
 <h1>Animals</h1>
 
 <!-- Filter Form -->
-<form method="get">
-    <input type="text" name="name" placeholder="Search by name" value="{{ request.GET.name }}">
-    <select name="species">
+<form method="get" class="mb-4">
+    <input type="text" name="name" class="form-control d-inline-block w-auto" placeholder="Search by name" value="{{ request.GET.name }}">
+    <select name="species" class="form-select d-inline-block w-auto">
         <option value="">All Species</option>
         {% for species in species_list %}
             <option value="{{ species }}" {% if species == request.GET.species %}selected{% endif %}>{{ species }}</option>
         {% endfor %}
     </select>
-    <button type="submit" class="btn btn-primary">Filter</button>
+    <button type="submit" class="btn btn-primary">Search</button>
 
     <!-- Add animal -->
     {% if user.is_authenticated and user|can_manage_animals %}
-        <a href="{% url 'animal_create' %}" class="btn btn-success">Add Animal</a>
+        <a href="{% url 'animal_create' %}" class="btn btn-success ms-2">Add Animal</a>
     {% endif %}
 </form>
 
 <div class="animal-list">
     {% for animal in animals %}
-        <div class="animal-item d-flex align-items-center mb-4 p-3 border rounded">
-            <!-- Clickable region -->
-            <a href="{% url 'animal_detail' animal.id %}" class="d-flex flex-grow-1 align-items-center text-decoration-none">
+        <div class="animal-item d-flex position-relative mb-4 p-3 border rounded">
+            <!-- Clickable area -->
+            <a href="{% url 'animal_detail' animal.id %}" class="animal-item-link d-flex flex-grow-1">
                 <!-- Image -->
-                <div class="animal-image-container align-self-center">
+                <div class="animal-image-container">
                     <img src="{% if animal.image_url %}{{ animal.image_url }}{% else %}{% static 'images/default_animal.png' %}{% endif %}"
                          alt="{{ animal.name }}"
-                         class="animal-image"
-                         style="width: 100px; height: 100px; object-fit: cover;">
+                         class="animal-image">
                 </div>
 
                 <!-- Details -->
                 <div class="animal-details ms-4">
-                    <h3 class="text-dark mb-0" style="line-height: 1.2;">{{ animal.name }}</h3>
-                    <p class="text-muted mt-1 mb-0">{{ animal.description }}</p>
+                    <h3 class="text-dark mb-2" style="line-height: 1.2;">{{ animal.name }}</h3>
+                    <p class="text-muted description">{{ animal.description }}</p>
                 </div>
             </a>
 
             <!-- Buttons -->
-            {% if user.is_authenticated%}
-                <div class="animal-actions ms-3">
+            {% if user.is_authenticated %}
+            <div class="animal-actions ms-3 d-flex align-items-end">
+                <form class="d-flex align-items-center" method="post">
+                    {% csrf_token %}
                     {% if user|is_volunteer %}
-                        <a href="#" class="btn btn-info btn-sm">Schedule a walk</a>
-
+                        <a href="#" class="btn btn-info btn-sm me-2">Schedule a walk</a>
                     {% elif user|is_vet %}
-                        <a href="#" class="btn btn-info btn-sm">Health records</a>
-
+                        <a href="#" class="btn btn-info btn-sm me-2">Health records</a>
                     {% elif user|can_manage_animals %}
-                    <a href="#" class="btn btn-info btn-sm">Walk schedule</a>
-                    <a href="#" class="btn btn-info btn-sm">Vet requests</a>
-                    <a href="{% url 'animal_edit' animal.id %}" class="btn btn-warning btn-sm">Edit</a>
-
-                    <form method="post" action="{% url 'animal_delete' animal.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                    </form>
+                        <a href="#" class="btn btn-info btn-sm me-2">Walk schedule</a>
+                        <a href="#" class="btn btn-info btn-sm me-2">Vet requests</a>
+                        <a href="{% url 'animal_edit' animal.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
+                        <button type="submit" formaction="{% url 'animal_delete' animal.id %}" class="btn btn-danger btn-sm">
+                            Delete
+                        </button>
                     {% endif %}
-                </div>
+                </form>
+            </div>
             {% endif %}
+
+
         </div>
     {% endfor %}
 </div>
+
+
+
+
+
 
 {% endblock %}

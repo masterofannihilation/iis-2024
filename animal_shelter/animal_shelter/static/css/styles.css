@@ -1,38 +1,42 @@
+.animal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.animal-item-link {
+  display: flex;
+  flex-grow: 0;
+  max-width: 100%;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
 .animal-image-container {
   width: 150px;
   height: 150px;
   overflow: hidden;
   border-radius: 8px;
-  margin-right: 20px;
 }
 
 .animal-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.animal-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px;
-  border: 1px solid #ddd;
   border-radius: 8px;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
 }
 
-.animal-item-link {
-  display: block;
-  color: inherit;
-  transition: background-color 0.3s ease;
-}
-
-.animal-item-link:hover {
-  background-color: #f8f9fa;
-  text-decoration: none;
+.animal-details {
+  flex-grow: 1;
+  max-width: calc(100% - 180px);
 }
 
 .animal-details h3 {
@@ -41,14 +45,35 @@
   font-weight: bold;
 }
 
-.animal-details p {
-  font-size: 1rem;
-  color: #555;
+.animal-details .description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  line-clamp: 4;
+}
+
+.animal-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  margin-left: auto;
+  align-self: flex-end;
+}
+
+.animal-actions form {
+  margin: 0;
+  padding: 0;
+  display:inline;
 }
 
 .animal-actions .btn-sm {
-  font-size: 0.875rem;
-  padding: 6px 12px;
+  font-size: 1rem;
+  margin-right: 8px;
+  white-space: nowrap;
 }
 
 .animal-list {
@@ -57,25 +82,4 @@
 
 form {
   margin-bottom: 20px;
-}
-
-.navbar-custom {
-  padding-left: 1rem !important;
-  padding-right: 1rem !important;
-  height: 4rem !important;
-  font-size: 1.25rem !important;
-  background-color: #535353 !important;
-}
-
-.navbar-custom a {
-  color: #ffffff !important;
-}
-
-.navbar-custom a:hover {
-  color: #b6b6b6 !important;
-}
-
-.content-container-custom {
-  padding: 4rem !important;
-  margin-top: 1rem !important;
 }
