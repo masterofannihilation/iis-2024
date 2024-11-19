@@ -58,3 +58,24 @@
 form {
   margin-bottom: 20px;
 }
+
+.navbar-custom {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  height: 4rem !important;
+  font-size: 1.25rem !important;
+  background-color: #535353 !important;
+}
+
+.navbar-custom a {
+  color: #ffffff !important;
+}
+
+.navbar-custom a:hover {
+  color: #b6b6b6 !important;
+}
+
+.content-container-custom {
+  padding: 4rem !important;
+  margin-top: 1rem !important;
+}
