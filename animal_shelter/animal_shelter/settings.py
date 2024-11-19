@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,6 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # DEBUG=False
 # ALLOWED_HOSTS=<domain_of_the_web_service>
 # SEED_USER_PWD=<default_password_of_seeded_users>
+# DATABASE_URL=<see dj_database_url usage>
 
 # Set SECRET_KEY in production!
 _development_key = "django-insecure-$(!hr+2ddrbr^o75u5q0d(8immx-jfcmg)##o7mh4j3%h%^_bx"
@@ -40,6 +42,8 @@ if not DEBUG:
 
     # Against Cross-Site Request Forgery
     CSRF_COOKIE_SECURE = True
+
+USE_POSTGRESQL = os.getenv("USE_POSTGRESQL", "False") == "True" or not DEBUG
 
 ###############################################################################
 ### Application definition
@@ -88,8 +92,9 @@ TEMPLATES = [
 WSGI_APPLICATION = "animal_shelter.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+###############################################################################
+### Database settings
+###############################################################################
 
 DATABASES = {
     "default": {
@@ -97,6 +102,14 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+if USE_POSTGRESQL or os.getenv("DATABASE_URL"):
+    DATABASES = {
+        "default": dj_database_url.config(
+            env="DATABASE_URL",
+            default="postgres://user:password@localhost:5432/shelter",  # Dockerfile database
+        )
+    }
 
 
 # Password validation
