@@ -1,6 +1,7 @@
 from ..models import User
+import os
 
-NAIVE_PASSWORD = "password"
+NAIVE_PASSWORD = os.getenv("SEED_USER_PWD", "password")
 
 #                 User, password
 USER_SEEDS: list[tuple[User, str]] = [
