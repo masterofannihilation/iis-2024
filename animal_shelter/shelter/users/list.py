@@ -49,10 +49,11 @@ class UserListModel:
                 self.modifiable = False
             elif viewer.role == User.Role.ADMINISTRATOR:
                 self.modifiable = True
-            elif (
-                viewer.role == User.Role.CAREGIVER and self.role == User.Role.VOLUNTEER
-            ):
-                self.modifiable = True
+            elif viewer.role == User.Role.CAREGIVER:
+                self.modifiable = self.role in (
+                    User.Role.VOLUNTEER,
+                    User.Role.UNVERIFIED,
+                )
 
     @staticmethod
     def search(

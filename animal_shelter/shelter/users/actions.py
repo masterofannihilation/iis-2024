@@ -25,13 +25,11 @@ class ActionOverUsers:
             return False
         if self.requested_by.role == User.Role.ADMINISTRATOR:
             return True
-        elif (
-            self.requested_by.role == User.Role.CAREGIVER
-            and modified_user.role == User.Role.VOLUNTEER
-        ):
-            return True
-        else:
-            return False
+        elif self.requested_by.role == User.Role.CAREGIVER:
+            if modified_user.role in (User.Role.VOLUNTEER, User.Role.UNVERIFIED):
+                return True
+
+        return False
 
     def _retrieve_users(self, ids: list[int]) -> list[User]:
         return User.objects.filter(id__in=ids)  # type: ignore
@@ -83,8 +81,8 @@ class ActionOverUsers:
             self.result = users
             return self.result
 
-        if self.requested_by.role != User.Role.ADMINISTRATOR:
-            return HttpResponseForbidden("Access Denied: Insufficient privileges.")
+        # if self.requested_by.role != User.Role.ADMINISTRATOR:
+        #     return HttpResponseForbidden("Access Denied: Insufficient privileges.")
 
         for u in users:
             u.role = role

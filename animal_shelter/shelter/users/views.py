@@ -1,3 +1,4 @@
+from functools import wraps
 from typing import Optional
 from django.shortcuts import render, redirect, get_object_or_404
 from .actions import ActionOverUsers
@@ -6,9 +7,20 @@ from django.contrib.auth.decorators import login_required
 from .list import TableHeader, UserListModel, UserFilterArgs
 from django.http.request import HttpRequest
 from django.http import HttpResponseForbidden, QueryDict
-from django.forms import ModelForm, CheckboxInput, Select, ValidationError
+from django.forms import (
+    ModelForm,
+    CheckboxInput,
+    Select,
+    ValidationError,
+    EmailField,
+    CharField,
+    Textarea,
+    TextInput,
+    PasswordInput,
+    EmailInput,
+)
 from django.contrib.auth import logout
-from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 
@@ -32,21 +44,85 @@ class UserEditForm(ModelForm):
         self.caregiver = kwargs.pop("caregiver", None)
         super().__init__(*args, **kwargs)
         if self.caregiver:
-            self.fields["role"].choices = [(User.Role.VOLUNTEER, User.Role.VOLUNTEER)]
+            self.fields["role"].choices = [
+                (User.Role.VOLUNTEER, User.Role.VOLUNTEER),
+                (User.Role.UNVERIFIED, User.Role.UNVERIFIED),
+            ]
 
     def clean_role(self):
         role = self.cleaned_data.get("role")
 
-        if self.caregiver and role != User.Role.VOLUNTEER:
+        if self.caregiver and role not in (User.Role.VOLUNTEER, User.Role.UNVERIFIED):
             raise ValidationError("Caregivers can only assign the 'Volunteer' role.")
 
         return role
+
+
+class CustomRegistrationForm(UserCreationForm):
+    username = CharField(
+        required=True,
+        widget=TextInput(attrs={"class": "form-control"}),
+        label_suffix="*",
+    )
+    password1 = CharField(
+        required=True,
+        widget=PasswordInput(attrs={"class": "form-control"}),
+        label="Password",
+        label_suffix="*",
+    )
+    password2 = CharField(
+        required=True,
+        widget=PasswordInput(attrs={"class": "form-control"}),
+        label="Repeat password",
+        label_suffix="*",
+    )
+    email = EmailField(
+        required=False, widget=EmailInput(attrs={"class": "form-control"})
+    )
+
+    contact_info = CharField(
+        required=False, widget=Textarea(attrs={"class": "form-control"})
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "password1",
+            "password2",
+            "email",
+            "first_name",
+            "last_name",
+            "contact_info",
+        ]
 
 
 class ProfileEditForm(ModelForm):
     class Meta:
         model = User
         fields = ["email", "contact_info"]
+
+
+def user_can_manage_users(view_func):
+    @wraps(view_func)
+    def wrapper(request: HttpRequest, *args, **kwargs):
+        user: Optional[User] = request.user if request.user.is_authenticated else None  # type: ignore
+        forbid_access = not request.user.is_authenticated
+
+        if user:
+            forbid_access = not user.role in [
+                User.Role.CAREGIVER,
+                User.Role.ADMINISTRATOR,
+            ]
+        else:
+            forbid_access = True
+
+        if forbid_access:
+            return HttpResponseForbidden("Access Denied: Insufficient privileges.")
+
+        return view_func(request, *args, **kwargs)
+
+    return wrapper
 
 
 def _copy_query_params(query: QueryDict, exclude: list[str] = []) -> QueryDict:
@@ -66,7 +142,7 @@ def min_user_privileges(
 
 
 # View for users
-@login_required
+@user_can_manage_users
 def users_list(request: HttpRequest):
     forbidden = min_user_privileges(request, User.Role.CAREGIVER)
     if forbidden:
@@ -92,15 +168,15 @@ def users_list(request: HttpRequest):
             result = action.delete(selected_ids)
         elif "change_role":
             changed_role_str = request.POST.get("role")
+            action.result = False
+            action.msg = f"No role was chosen!"
             if changed_role_str:
                 changed_role = None
                 try:
                     changed_role = User.Role.from_string(changed_role_str)
                 except ValueError:
-                    action.result = False
-                    action.msg = f"Choose role!"
                     pass
-                if changed_role:
+                if changed_role is not None:
                     result = action.change_role(changed_role, selected_ids)
         if action.was_successful():
             messages.success(request, action.msg)
@@ -126,14 +202,14 @@ def users_list(request: HttpRequest):
     return render(request, "users/list.html", context)
 
 
-@login_required
+@user_can_manage_users
 def user_detail(request: HttpRequest, id: int):
     forbidden = min_user_privileges(request, User.Role.CAREGIVER)
     if forbidden:
         return forbidden
 
     user = get_object_or_404(User, id=id)
-    return render(request, "users/detail.html", {"user": user, "profile_page": False})
+    return render(request, "users/detail.html", {"user": UserListModel(user, viewer=request.user), "profile_page": False})  # type: ignore
 
 
 def _user_modification(request: HttpRequest, id: Optional[int], context: dict):
@@ -143,7 +219,7 @@ def _user_modification(request: HttpRequest, id: Optional[int], context: dict):
         user = get_object_or_404(User, id=id)
 
         min_role = User.Role.ADMINISTRATOR
-        if user.role == User.Role.VOLUNTEER:
+        if user.role in (User.Role.VOLUNTEER, User.Role.UNVERIFIED):
             min_role = User.Role.CAREGIVER
     forbidden = min_user_privileges(request, min_role)
     if forbidden:
@@ -163,7 +239,7 @@ def _user_modification(request: HttpRequest, id: Optional[int], context: dict):
     context["user"] = user
 
 
-@login_required
+@user_can_manage_users
 def user_create(request: HttpRequest):
     context = {}
 
@@ -174,7 +250,7 @@ def user_create(request: HttpRequest):
     return render(request, "users/create.html", context)
 
 
-@login_required
+@user_can_manage_users
 def user_edit(request: HttpRequest, id: int):
     context = {}
 
@@ -188,6 +264,21 @@ def user_edit(request: HttpRequest, id: int):
 def logout_view(request):
     logout(request)
     return redirect("login")
+
+
+def register(request: HttpRequest):
+    if request.method == "POST":
+        form = CustomRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                "You have successfully registered! Contact caregivers to verify you as a volunteer.",
+            )
+            return redirect("login")  # Replace 'login' with the name of your login view
+    else:
+        form = CustomRegistrationForm()
+    return render(request, "users/register.html", {"form": form})
 
 
 @login_required
@@ -210,7 +301,11 @@ def reset_password(request: HttpRequest, id: int):
 @login_required
 def profile_detail(request: HttpRequest):
     user = get_object_or_404(User, id=request.user.id)  # type: ignore
-    return render(request, "users/detail.html", {"user": user, "profile_page": True})
+    return render(
+        request,
+        "users/detail.html",
+        {"user": UserListModel(user), "profile_page": True},
+    )
 
 
 @login_required

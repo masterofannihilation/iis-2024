@@ -45,6 +45,8 @@ if not DEBUG:
 
 USE_POSTGRESQL = os.getenv("USE_POSTGRESQL", "False") == "True" or not DEBUG
 
+ALLOW_WEAK_PWD = os.getenv("ALLOW_WEAK_PWD", "True") == "True"
+
 ###############################################################################
 ### Application definition
 ###############################################################################
@@ -111,9 +113,9 @@ if USE_POSTGRESQL or os.getenv("DATABASE_URL"):
         )
     }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+###############################################################################
+### Password validation
+###############################################################################
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -130,6 +132,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+if ALLOW_WEAK_PWD:
+    AUTH_PASSWORD_VALIDATORS = []  # Disables all password validators
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
