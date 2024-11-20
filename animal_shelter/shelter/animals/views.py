@@ -49,6 +49,9 @@ def user_can_manage_animals(view_func):
 
     return wrapper
 
+def animal_detail(request, id):
+    animal = get_object_or_404(Animal, id=id)
+    return render(request, "animals/detail.html", {"animal": animal})
 
 def animals_list(request):
     animals = Animal.objects.all()
@@ -87,15 +90,11 @@ def animal_create(request):
 
 
 @login_required
-def animal_detail(request, id):
-    animal = get_object_or_404(Animal, id=id)
-    return render(request, "animals/detail.html", {"animal": animal})
-
-
-@login_required
 @user_can_manage_animals
 def animal_edit(request, id):
     animal = get_object_or_404(Animal, id=id)
+    available_species = [species[0] for species in Animal.AnimalType.choices]
+
     if request.method == "POST":
         form = AnimalForm(request.POST, instance=animal)
         if form.is_valid():
@@ -106,7 +105,7 @@ def animal_edit(request, id):
             return redirect("animal_detail", id=id)
     else:
         form = AnimalForm(instance=animal)
-    return render(request, "animals/edit.html", {"form": form, "animal": animal})
+    return render(request, "animals/edit.html", {"form": form, "animal": animal, "available_species": available_species})
 
 
 @login_required
