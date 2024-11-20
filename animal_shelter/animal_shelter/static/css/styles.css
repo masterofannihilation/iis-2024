@@ -76,6 +76,22 @@
   white-space: nowrap;
 }
 
+.animal-actions-detail {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start; /* Aligns buttons with the top of the text */
+  justify-content: flex-start;
+  margin-top: 20px; /* Keeps the spacing between the animal details and buttons */
+  margin-left: 0; /* Remove any left margin to fix the gap */
+}
+
+.animal-actions-detail .btn-lg {
+  font-size: 1.4rem; /* Adjust the button size for consistency */
+  margin-right: 12px; /* Adds spacing between buttons */
+  white-space: nowrap; /* Prevents buttons from wrapping */
+}
+
 .animal-list {
   margin-top: 20px;
 }
