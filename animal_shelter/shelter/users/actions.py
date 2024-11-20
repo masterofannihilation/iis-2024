@@ -47,6 +47,11 @@ class ActionOverUsers:
                 return self.result
         return users
 
+    def _return_forbidden_access(self) -> HttpResponseForbidden:
+        self.result = HttpResponseForbidden("Access Denied: Insufficient privileges.")
+        self.msg = "Access Denied: Insufficient privileges."
+        return self.result
+
     def set_active_state(
         self, set_active: bool, ids: list[int]
     ) -> Optional[HttpResponseForbidden]:
@@ -81,8 +86,14 @@ class ActionOverUsers:
             self.result = users
             return self.result
 
-        # if self.requested_by.role != User.Role.ADMINISTRATOR:
-        #     return HttpResponseForbidden("Access Denied: Insufficient privileges.")
+        if self.requested_by.role not in (User.Role.ADMINISTRATOR, User.Role.CAREGIVER):
+            return self._return_forbidden_access()
+
+        if self.requested_by.role == User.Role.CAREGIVER and role not in (
+            User.Role.VOLUNTEER,
+            User.Role.UNVERIFIED,
+        ):
+            return self._return_forbidden_access()
 
         for u in users:
             u.role = role

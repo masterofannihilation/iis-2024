@@ -141,13 +141,9 @@ def min_user_privileges(
         return HttpResponseForbidden("Access Denied: Insufficient privileges.")
 
 
-# View for users
+@login_required
 @user_can_manage_users
 def users_list(request: HttpRequest):
-    forbidden = min_user_privileges(request, User.Role.CAREGIVER)
-    if forbidden:
-        return forbidden
-
     context = {}
 
     context["is_admin"] = request.user.role == User.Role.ADMINISTRATOR  # type: ignore
@@ -181,7 +177,10 @@ def users_list(request: HttpRequest):
         if action.was_successful():
             messages.success(request, action.msg)
         else:
-            messages.error(request, action.msg)
+            if isinstance(action.result, HttpResponseForbidden):
+                messages.error(request, str(action.result.content))
+            else:
+                messages.error(request, action.msg)
         users_page = UserListModel.search(viewer=request.user)  # type: ignore
     else:  # GET method
         fa = UserFilterArgs.from_method_query(request.GET)
@@ -202,12 +201,9 @@ def users_list(request: HttpRequest):
     return render(request, "users/list.html", context)
 
 
+@login_required
 @user_can_manage_users
 def user_detail(request: HttpRequest, id: int):
-    forbidden = min_user_privileges(request, User.Role.CAREGIVER)
-    if forbidden:
-        return forbidden
-
     user = get_object_or_404(User, id=id)
     return render(request, "users/detail.html", {"user": UserListModel(user, viewer=request.user), "profile_page": False})  # type: ignore
 
@@ -239,6 +235,7 @@ def _user_modification(request: HttpRequest, id: Optional[int], context: dict):
     context["user"] = user
 
 
+@login_required
 @user_can_manage_users
 def user_create(request: HttpRequest):
     context = {}
@@ -250,6 +247,7 @@ def user_create(request: HttpRequest):
     return render(request, "users/create.html", context)
 
 
+@login_required
 @user_can_manage_users
 def user_edit(request: HttpRequest, id: int):
     context = {}

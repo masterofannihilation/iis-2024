@@ -82,6 +82,8 @@ class UserListModel:
         if fa.sort_by:
             sort_param = f"-{fa.sort_by}" if fa.descending else fa.sort_by
             users = users.order_by(sort_param)
+        else:
+            users = users.order_by("id")
 
         paginator = Paginator(users, limit)
         page_obj = paginator.get_page(fa.page)
