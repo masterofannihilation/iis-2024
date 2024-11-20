@@ -1,7 +1,38 @@
 {% extends "base.html" %}
-
-{% block title %}Shelter HOME{% endblock %}
-
 {% block content %}
-<h1>Shelter's home page</h1>
+<div class="container text-center my-5">
+    <h1 class="display-4">Animal Shelter</h1>
+    {% if not logged_in_user.is_authenticated %}
+    <a class="btn btn-primary btn-lg mt-3">Become a Volunteer</a>
+    {% endif %}
+</div>
+
+<!-- Slideshow -->
+<div id="animalCarousel" class="carousel slide mx-auto" data-bs-ride="carousel" data-bs-interval="3000" style="max-width: 1000px;">
+    <div class="carousel-inner">
+        {% for animal in animals %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <a href="{% url 'animal_detail' animal.id %}">
+                <img src="{{ animal.image_url }}" class="d-block w-100 animal-carousel-image" alt="{{ animal.name }}">
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#animalCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#animalCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+<style>
+    .animal-carousel-image {
+        object-fit: contain;
+        height: 600px;
+    }
+</style>
+
 {% endblock %}

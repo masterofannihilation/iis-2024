@@ -52,26 +52,26 @@
 
             <ul class="navbar-nav ms-auto align-items-center" style=" font-size: large;">
                 {% if logged_in_user.is_authenticated %}
-
-                <!-- Username and log out button -->
-                <li class="nav-item d-flex align-items-center" style="padding-top: 1rem;">
-                    <form method="POST" action="{% url 'logout' %}" class="row row-cols-lg-auto g-3 align-items-center">
-                        {% csrf_token %}
-                        <span class="text-white me-2">Logged in as
-                            <a href="{% url 'profile' %}" class="ms-1" style="color: #aac3f0;">{{ logged_in_user.username }} {{ logged_in_user_fullname }}</a>
-                        </span>
-                        <button type="submit" class="btn btn-secondary btn-md ms-2">Log out</button>
-                    </form>
-                </li>
+                    <!-- Username and log out button -->
+                    <li class="nav-item d-flex align-items-center" style="padding-top: 1rem;">
+                        <form method="POST" action="{% url 'logout' %}" class="row row-cols-lg-auto g-3 align-items-center">
+                            {% csrf_token %}
+                            <span class="text-white me-2">Logged in as
+                                <a href="{% url 'profile' %}" class="ms-1" style="color: #aac3f0;">{{ logged_in_user.username }} {{ logged_in_user_fullname }}</a>
+                            </span>
+                            <button type="submit" class="btn btn-secondary btn-md ms-2">Log out</button>
+                        </form>
+                    </li>
                 {% else %}
-                <!-- Log in button -->
-                <li class="nav-item d-flex align-items-center me-1">
-                    <a class="btn btn-primary btn-md" href="{% url 'login' %}">Log in</a>
-                </li>
-
-                <li class="nav-item d-flex align-items-center me-1">
-                    <a class="btn btn-secondary btn-md" href="{% url 'register' %}">Register</a>
-                </li>
+                    <!-- Log in button -->
+                    {% if request.resolver_match.url_name != 'login' %}
+                        <li class="nav-item d-flex align-items-center me-1">
+                            <a class="btn btn-primary btn-md" href="{% url 'login' %}">Log in</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item d-flex align-items-center me-1">
+                        <a class="btn btn-secondary btn-md" href="{% url 'register' %}">Register</a>
+                    </li>
 
                 {% endif %}
             </ul>

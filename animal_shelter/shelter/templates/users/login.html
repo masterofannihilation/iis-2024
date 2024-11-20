@@ -1,27 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}Log in{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-top vh-100 py-4">
-    <div class="text-center">
-        <h2>Login</h2>
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-sm p-4" style="width: 400px;">
+        <h2 class="text-center mb-4">Login</h2>
         {% if form.errors %}
-            <p style="color: red;">Invalid username or password. Please try again.</p>
+        <div class="alert alert-danger" role="alert">
+            Invalid username or password. Please try again.
+        </div>
         {% endif %}
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Login</button>
+            <div class="mb-3">
+                <label for="id_username" class="form-label">Username</label>
+                <input
+                    type="text"
+                    name="username"
+                    id="id_username"
+                    class="form-control"
+                    value="{{ form.username.value|default_if_none:'' }}"
+                    required>
+            </div>
+            <div class="mb-3">
+                <label for="id_password" class="form-label">Password</label>
+                <input
+                    type="password"
+                    name="password"
+                    id="id_password"
+                    class="form-control"
+                    required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
-
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-            <li class="alert alert-{{ message.tags }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
     </div>
 </div>
+
+<style>
+    body {
+        background-color: #f4f4f4;
+    }
+
+    .vh-100 {
+        height: 100vh;
+    }
+</style>
 {% endblock %}
