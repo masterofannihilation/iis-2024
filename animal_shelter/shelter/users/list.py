@@ -49,10 +49,11 @@ class UserListModel:
                 self.modifiable = False
             elif viewer.role == User.Role.ADMINISTRATOR:
                 self.modifiable = True
-            elif (
-                viewer.role == User.Role.CAREGIVER and self.role == User.Role.VOLUNTEER
-            ):
-                self.modifiable = True
+            elif viewer.role == User.Role.CAREGIVER:
+                self.modifiable = self.role in (
+                    User.Role.VOLUNTEER,
+                    User.Role.UNVERIFIED,
+                )
 
     @staticmethod
     def search(
@@ -81,6 +82,8 @@ class UserListModel:
         if fa.sort_by:
             sort_param = f"-{fa.sort_by}" if fa.descending else fa.sort_by
             users = users.order_by(sort_param)
+        else:
+            users = users.order_by("id")
 
         paginator = Paginator(users, limit)
         page_obj = paginator.get_page(fa.page)

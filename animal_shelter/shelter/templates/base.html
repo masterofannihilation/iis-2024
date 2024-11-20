@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+{% load permissions %} <!-- loads templatetags/permissions.py -->
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}insert title{% endblock %}{% load static %}</title>
@@ -42,7 +42,7 @@
                     <a class="nav-link {% if request.resolver_match.url_name == 'animals_list' %}active{% endif %}"
                         href="{% url 'animals_list' %}">Animals</a>
                 </li>
-                {% if logged_in_user.is_authenticated %}
+                {% if logged_in_user|can_manage_users %}
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'users_list' %}active{% endif %}"
                         href="{% url 'users_list' %}">Users</a>
@@ -57,18 +57,22 @@
                         <form method="POST" action="{% url 'logout' %}" class="row row-cols-lg-auto g-3 align-items-center">
                             {% csrf_token %}
                             <span class="text-white me-2">Logged in as
-                                <a href="{% url 'profile' %}" class="ms-1" style="color: #aac3f0;">{{ logged_in_user.username }}</a>
+                                <a href="{% url 'profile' %}" class="ms-1" style="color: #aac3f0;">{{ logged_in_user.username }} {{ logged_in_user_fullname }}</a>
                             </span>
                             <button type="submit" class="btn btn-secondary btn-md ms-2">Log out</button>
                         </form>
                     </li>
-                    {% else %}
+                {% else %}
                     <!-- Log in button -->
                     {% if request.resolver_match.url_name != 'login' %}
-                        <li class="nav-item d-flex align-items-center">
+                        <li class="nav-item d-flex align-items-center me-1">
                             <a class="btn btn-primary btn-md" href="{% url 'login' %}">Log in</a>
                         </li>
                     {% endif %}
+                    <li class="nav-item d-flex align-items-center me-1">
+                        <a class="btn btn-secondary btn-md" href="{% url 'register' %}">Register</a>
+                    </li>
+
                 {% endif %}
             </ul>
 

@@ -1,42 +1,64 @@
 {% extends "base.html" %}
 
-{% block title %}User List{% endblock %}
+{% block title %}Manage Users{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2>User List</h2>
 
-    <a href="{% url 'user_create' %}">Create new user</a>
+    <div class="container py-3">
+        <div class="row align-items-center justify-content-between">
+            <!-- Header aligned to the left -->
+            <div class="col-auto">
+                <h2 class="mb-0">Registered Users</h2>
+            </div>
+            <!-- Button aligned to the right -->
+            <div class="col-auto">
+                <a href="{% url 'user_create' %}" class="btn btn-primary">Create new user</a>
+            </div>
+        </div>
+    </div>
 
     <form method="get">
-        {% csrf_token %}
         <div class="row mb-3">
             <div class="col">
-                <input type="text" name="username" value="{{ filters_page.username }}" placeholder="Search by username"
-                    class="form-control">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" id="username" name="username" value="{{ filters_page.username }}" 
+                    placeholder="Search by username" class="form-control">
             </div>
+    
             <div class="col">
-                <input type="text" name="first_name" value="{{ filters_page.first_name }}" placeholder="Search by first name"
-                    class="form-control">
+                <label for="first_name" class="form-label">First Name</label>
+                <input type="text" id="first_name" name="first_name" value="{{ filters_page.first_name }}" 
+                    placeholder="Search by first name" class="form-control">
             </div>
+    
             <div class="col">
-                <input type="text" name="last_name" value="{{ filters_page.last_name }}" placeholder="Search by last name"
-                    class="form-control">
+                <label for="last_name" class="form-label">Last Name</label>
+                <input type="text" id="last_name" name="last_name" value="{{ filters_page.last_name }}" 
+                    placeholder="Search by last name" class="form-control">
             </div>
+    
             <div class="col">
-                <input type="text" name="email" value="{{ filters_page.email }}" placeholder="Search by email" class="form-control">
+                <label for="email" class="form-label">Email</label>
+                <input type="text" id="email" name="email" value="{{ filters_page.email }}" 
+                    placeholder="Search by email" class="form-control">
             </div>
+    
             <div class="col">
+                <label for="filter_role" class="form-label">Role</label>
                 <select class="form-select" id="filter_role" name="filter_role">
                     <option value="">Filter by role</option>
                     <option value="Administrator"{% if filters_page.filter_role == "Administrator" %}selected{% endif %}>Administrator</option>
                     <option value="Caregiver"{% if filters_page.filter_role == "Caregiver" %}selected{% endif %}>Caregiver</option>
                     <option value="Veterinarian"{% if filters_page.filter_role == "Veterinarian" %}selected{% endif %}>Veterinarian</option>
                     <option value="Volunteer"{% if filters_page.filter_role == "Volunteer" %}selected{% endif %}>Volunteer</option>
+                    <option value="Unverified"{% if filters_page.filter_role == "Unverified" %}selected{% endif %}>Unverified</option>
                 </select>    
             </div>
+    
             <div class="col">
-                <button class="btn btn-outline-secondary" type="submit" name="search" value="search">Search</button>
+                <label class="form-label d-block" style="visibility: hidden;">Search</label>
+                <button class="btn btn-primary w-100" type="submit" name="search" value="search">Search</button>
             </div>
         </div>
     </form>
@@ -83,11 +105,11 @@
                     <td>{{ user.role }}</td>
                     <td>{{ user.is_active|yesno:"Yes, No" }}</td>
                     <td>
-                        <a href="{% url 'user_detail' id=user.id %}">
+                        <a href="{% url 'user_detail' id=user.id %}" title="Show Detail" class="btn btn-primary btn-sm">
                             <i class="bi bi-eye"></i>
                         </a>
-                        {% if user.modifiable %}
-                        <a href="{% url 'user_edit' id=user.id %}" title="Edit User">
+                        {% if user.modifiable or logged_in_admin %}
+                        <a href="{% url 'user_edit' id=user.id %}" title="Edit User" class="btn btn-secondary btn-sm">
                             <i class="bi bi-pencil-fill"></i>
                         </a>
                         {% endif %}
@@ -96,36 +118,77 @@
                 {% endfor %}
             </tbody>
         </table>
-        <div class="d-flex justify-content-between">
-            {% if logged_in_admin %}
-            <select class="form-select" id="role" name="role">
-                <option value="">Choose a role...</option>
-                <option value="Administrator">Administrator</option>
-                <option value="Caregiver">Caregiver</option>
-                <option value="Veterinarian">Veterinarian</option>
-                <option value="Volunteer">Volunteer</option>
-            </select>
-            <button type="submit" name="change_role" value="change_role" class="btn btn-warning">Change Role</button>
-            {% endif %}
-            <button type="submit" name="activate" value="activate" class="btn btn-success">Activate</button>
-            <button type="submit" name="deactivate" value="deactivate" class="btn btn-secondary">Deactivate</button>
-            <button type="submit" name="delete" value="delete" class="btn btn-danger">Delete</button>
+
+        <div class="row gx-3 align-items-center">
+            <div class="col-auto">
+                <select class="form-select" id="role" name="role">
+                    <option value="">Choose a role...</option>
+                    {% if logged_in_admin %}
+                    <option value="Administrator">Administrator</option>
+                    <option value="Caregiver">Caregiver</option>
+                    <option value="Veterinarian">Veterinarian</option>
+                    {% endif %}
+                    <option value="Volunteer">Volunteer</option>
+                    <option value="Unverified">Unverified</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" name="change_role" value="change_role" class="btn btn-warning">Change Role</button>
+            </div>
+            <div class="col-auto">
+                <button type="submit" name="activate" value="activate" class="btn btn-success">Activate</button>
+            </div>
+            <div class="col-auto">
+                <button type="submit" name="deactivate" value="deactivate" class="btn btn-secondary">Deactivate</button>
+            </div>
+            <div class="col-auto">
+                <button type="submit" name="delete" value="delete" class="btn btn-danger">Delete</button>
+            </div>
         </div>
     </form>
-    <div class="pagination">
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}&{{ filters_page.urlencode }}">&laquo; Previous</a>
-        {% endif %}
-        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}&{{ filters_page.urlencode }}">Next &raquo;</a>
-        {% endif %}
-    </div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <!-- Page Info -->
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+    
+            <!-- Previous Button -->
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ filters_page.urlencode }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo; Previous</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo; Previous</span>
+            </li>
+            {% endif %}
+    
+            <!-- Next Button -->
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ filters_page.urlencode }}" aria-label="Next">
+                    <span aria-hidden="true">Next &raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Next &raquo;</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
 
     {% if messages %}
         <ul>
         {% for message in messages %}
+            {% if message.tags == "error" %}
+            <li class="alert alert-danger">{{ message }}</li>
+            {% else %}
             <li class="alert alert-{{ message.tags }}">{{ message }}</li>
+            {% endif %}
         {% endfor %}
         </ul>
     {% endif %}
