@@ -1,3 +1,4 @@
+/* Animal list page */
 .animal-item {
   display: flex;
   justify-content: space-between;
@@ -76,22 +77,6 @@
   white-space: nowrap;
 }
 
-.animal-actions-detail {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start; /* Aligns buttons with the top of the text */
-  justify-content: flex-start;
-  margin-top: 20px; /* Keeps the spacing between the animal details and buttons */
-  margin-left: 0; /* Remove any left margin to fix the gap */
-}
-
-.animal-actions-detail .btn-lg {
-  font-size: 1.4rem; /* Adjust the button size for consistency */
-  margin-right: 12px; /* Adds spacing between buttons */
-  white-space: nowrap; /* Prevents buttons from wrapping */
-}
-
 .animal-list {
   margin-top: 20px;
 }
@@ -100,12 +85,87 @@ form {
   margin-bottom: 20px;
 }
 
+
+/*Animal detail page*/
+
+.animal-actions-detail {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-top: 20px;
+  margin-left: 0;
+}
+
+.animal-actions-detail .btn-lg {
+  font-size: 1.4rem;
+  margin-right: 12px;
+  white-space: nowrap;
+}
+
 h1.display-4 {
   font-size: 3.5rem;
   margin-bottom: 20px;
 }
 
+/* Home page */
 .carousel-item img {
   object-fit: cover;
-  height: 800px; /* Adjust the height of the carousel */
+  height: 800px;
+}
+
+/* Navbar */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1030;
+  background-color: #535353;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+.navbar a {
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.navbar a:hover {
+  color: #b6b6b6;
+}
+
+.navbar .nav-item {
+  margin: 0 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+      font-size: 0.875rem;
+  }
+
+  .navbar .btn {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+  }
+
+  .navbar .nav-item {
+      margin: 0 0.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar {
+      font-size: 0.75rem;
+  }
+
+  .navbar .btn {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+  }
+}
+.content-container {
+  padding-top: 5rem;
 }

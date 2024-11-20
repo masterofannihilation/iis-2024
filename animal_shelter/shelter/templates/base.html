@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-{% load permissions %} <!-- loads templatetags/permissions.py -->
+{% load permissions %}
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}insert title{% endblock %}{% load static %}</title>
@@ -8,75 +8,38 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <style>
-        .navbar {
-            padding-left: 1.5rem;
-            padding-right: 1.5rem;
-            height: 4.5rem;
-            background-color: #535353;
-            font-size:x-large ;
-        }
-
-        .navbar a {
-            color: #ffffff;
-        }
-
-        .navbar a:hover {
-            color: #b6b6b6;
-        }
-
-    </style>
 </head>
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <a class="navbar-brand" href="{% url 'home' %}" style="font-size: x-large;">Shelter Home</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav d-flex flex-row">
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'animals_list' %}active{% endif %}"
-                        href="{% url 'animals_list' %}">Animals</a>
-                </li>
-                {% if logged_in_user|can_manage_users %}
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'users_list' %}active{% endif %}"
-                        href="{% url 'users_list' %}">Users</a>
-                </li>
+    <nav class="navbar d-flex align-items-center">
+        <a class="navbar-brand me-4" href="{% url 'home' %}" style="font-size: 1.25rem;">Shelter Home</a>
+        <ul class="navbar-nav d-flex flex-row">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'animals_list' %}active{% endif %}" href="{% url 'animals_list' %}">Animals</a>
+            </li>
+            {% if logged_in_user|can_manage_users %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'users_list' %}active{% endif %}" href="{% url 'users_list' %}">Users</a>
+            </li>
+            {% endif %}
+        </ul>
+
+        <div class="ms-auto d-flex align-items-center">
+            {% if logged_in_user.is_authenticated %}
+                <span class="text-white me-2">Logged in as
+                    <a href="{% url 'profile' %}" class="ms-1" style="color: #aac3f0;">{{ logged_in_user.username }}</a>
+                </span>
+                <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary btn-sm">Log out</button>
+                </form>
+            {% else %}
+                {% if request.resolver_match.url_name != 'login' %}
+                    <a class="btn btn-primary btn-sm me-2" href="{% url 'login' %}">Log in</a>
                 {% endif %}
-            </ul>
-
-            <ul class="navbar-nav ms-auto align-items-center" style=" font-size: large;">
-                {% if logged_in_user.is_authenticated %}
-                    <!-- Username and log out button -->
-                    <li class="nav-item d-flex align-items-center" style="padding-top: 1rem;">
-                        <form method="POST" action="{% url 'logout' %}" class="row row-cols-lg-auto g-3 align-items-center">
-                            {% csrf_token %}
-                            <span class="text-white me-2">Logged in as
-                                <a href="{% url 'profile' %}" class="ms-1" style="color: #aac3f0;">{{ logged_in_user.username }} {{ logged_in_user_fullname }}</a>
-                            </span>
-                            <button type="submit" class="btn btn-secondary btn-md ms-2">Log out</button>
-                        </form>
-                    </li>
-                {% else %}
-                    <!-- Log in button -->
-                    {% if request.resolver_match.url_name != 'login' %}
-                        <li class="nav-item d-flex align-items-center me-1">
-                            <a class="btn btn-primary btn-md" href="{% url 'login' %}">Log in</a>
-                        </li>
-                    {% endif %}
-                    <li class="nav-item d-flex align-items-center me-1">
-                        <a class="btn btn-secondary btn-md" href="{% url 'register' %}">Register</a>
-                    </li>
-
-                {% endif %}
-            </ul>
-
-
+                <a class="btn btn-secondary btn-sm" href="{% url 'register' %}">Register</a>
+            {% endif %}
         </div>
     </nav>
 
@@ -87,5 +50,4 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
-
 </html>

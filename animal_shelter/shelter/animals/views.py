@@ -102,7 +102,7 @@ def animal_edit(request, id):
             if not is_valid_image_url(animal.image_url):
                 animal.image_url = ""
             animal.save()
-            return redirect("animal_detail", id=id)
+            return redirect("animal_detail", id=animal.id)
     else:
         form = AnimalForm(instance=animal)
     return render(request, "animals/edit.html", {"form": form, "animal": animal, "available_species": available_species})
