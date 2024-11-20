@@ -4,16 +4,40 @@ from functools import wraps
 from ..models import Animal, User
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-
+import requests
+from urllib.parse import urlparse
 
 class AnimalForm(ModelForm):
     class Meta:
         model = Animal
-        fields = ["name", "species", "date_of_birth", "description", "intake_date"]
+        fields = ["name", "species", "date_of_birth", "description", "intake_date", "image_url"]
         widgets = {
             "date_of_birth": DateInput(attrs={"type": "date"}),
             "intake_date": DateInput(attrs={"type": "date"}),
         }
+
+def is_valid_image_url(url):
+    if not url:
+        return False
+
+    parsed_url = urlparse(url)
+    if not parsed_url.scheme or not parsed_url.netloc:
+        return False
+
+    try:
+        response = requests.get(url, timeout=2)
+        if response.status_code != 200:
+            return False
+
+        # Check if the content type is an image
+        content_type = response.headers.get('Content-Type')
+        if content_type and content_type.startswith('image/'):
+            return True
+        else:
+            return False
+
+    except requests.RequestException as e:
+        return False, f"Error: {str(e)}"
 
 
 def user_can_manage_animals(view_func):
@@ -51,7 +75,10 @@ def animal_create(request):
     if request.method == "POST":
         form = AnimalForm(request.POST)
         if form.is_valid():
-            form.save()
+            animal = form.save(commit=False)
+            if not is_valid_image_url(animal.image_url):
+                animal.image_url = ""
+            animal.save()
             return redirect("animals_list")
 
     else:
@@ -72,7 +99,10 @@ def animal_edit(request, id):
     if request.method == "POST":
         form = AnimalForm(request.POST, instance=animal)
         if form.is_valid():
-            form.save()
+            animal = form.save(commit=False)
+            if not is_valid_image_url(animal.image_url):
+                animal.image_url = ""
+            animal.save()
             return redirect("animal_detail", id=id)
     else:
         form = AnimalForm(instance=animal)
