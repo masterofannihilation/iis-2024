@@ -75,6 +75,7 @@ def animals_list(request):
 @login_required
 @user_can_manage_animals
 def animal_create(request):
+    available_species = [species[0] for species in Animal.AnimalType.choices]
     if request.method == "POST":
         form = AnimalForm(request.POST)
         if form.is_valid():
@@ -82,11 +83,11 @@ def animal_create(request):
             if not is_valid_image_url(animal.image_url):
                 animal.image_url = ""
             animal.save()
-            return redirect("animals_list")
-
+            return redirect("animal_detail", id=animal.id)
     else:
         form = AnimalForm()
-    return render(request, "animals/create.html", {"form": form})
+    return render(request, "animals/create.html", {"form": form, "available_species": available_species})
+
 
 
 @login_required
