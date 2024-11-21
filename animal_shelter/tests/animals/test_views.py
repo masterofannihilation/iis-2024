@@ -11,7 +11,7 @@ class AnimalTestBase(TestCase):
 
         # Create users with different roles
         self.admin = User.objects.create_user(
-            username="admin", password="password", role=User.Role.ADMINISTRATOR
+            username="test_admin", password="password", role=User.Role.ADMINISTRATOR
         )
         self.caregiver = User.objects.create_user(
             username="caregiver", password="password", role=User.Role.CAREGIVER

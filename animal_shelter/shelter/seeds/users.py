@@ -1,9 +1,22 @@
 from ..models import User
+import os
 
-NAIVE_PASSWORD = "password"
+NAIVE_PASSWORD = os.getenv("SEED_USER_PWD", "password")
 
 #                 User, password
 USER_SEEDS: list[tuple[User, str]] = [
+    (
+        User(
+            id=1_001_000,
+            username="admin",
+            first_name="Adam",
+            last_name="Administrator",
+            email="admin@shelter.cz",
+            contact_info="+420-955-123-456",
+            role=User.Role.ADMINISTRATOR,
+        ),
+        NAIVE_PASSWORD,
+    ),
     (
         User(
             id=1_001_001,
@@ -60,7 +73,7 @@ USER_SEEDS: list[tuple[User, str]] = [
             last_name="Hubbard",
             email="lacus@protonmail.ca",
             contact_info="1-625-851-9642",
-            role=User.Role.ADMINISTRATOR,
+            role=User.Role.UNVERIFIED,
         ),
         NAIVE_PASSWORD,
     ),
@@ -108,7 +121,7 @@ USER_SEEDS: list[tuple[User, str]] = [
             last_name="Leach",
             email="etiam.imperdiet.dictum@icloud.couk",
             contact_info="(744) 268-5624",
-            role=User.Role.ADMINISTRATOR,
+            role=User.Role.UNVERIFIED,
         ),
         NAIVE_PASSWORD,
     ),
@@ -204,7 +217,7 @@ USER_SEEDS: list[tuple[User, str]] = [
             last_name="Williams",
             email="pharetra@icloud.edu",
             contact_info="1-305-834-3008",
-            role=User.Role.ADMINISTRATOR,
+            role=User.Role.VOLUNTEER,
         ),
         NAIVE_PASSWORD,
     ),
@@ -252,7 +265,7 @@ USER_SEEDS: list[tuple[User, str]] = [
             last_name="Sharpe",
             email="tincidunt.aliquam@icloud.org",
             contact_info="1-518-728-1192",
-            role=User.Role.ADMINISTRATOR,
+            role=User.Role.UNVERIFIED,
         ),
         NAIVE_PASSWORD,
     ),
@@ -264,7 +277,7 @@ USER_SEEDS: list[tuple[User, str]] = [
             last_name="Dudley",
             email="fermentum.risus@aol.couk",
             contact_info="1-272-617-8067",
-            role=User.Role.CAREGIVER,
+            role=User.Role.UNVERIFIED,
         ),
         NAIVE_PASSWORD,
     ),
