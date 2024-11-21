@@ -10,6 +10,7 @@ class User(AbstractUser):
         CAREGIVER = "Caregiver", "Caregiver"
         VETERINARIAN = "Veterinarian", "Veterinarian"
         VOLUNTEER = "Volunteer", "Volunteer"
+        UNVERIFIED = "Unverified", "Unverified"
 
         @staticmethod
         def from_string(s: str) -> "User.Role":
@@ -30,6 +31,7 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=20,
         choices=Role.choices,  # Use the enumeration here
+        default=Role.UNVERIFIED,
     )
     contact_info = models.TextField(blank=True, null=True)
 
@@ -47,6 +49,7 @@ class User(AbstractUser):
             User.Role.CAREGIVER,
             User.Role.VETERINARIAN,
             User.Role.VOLUNTEER,
+            User.Role.UNVERIFIED,
         )
         # the lower the index the higher the privileges
         min_role_idx = order.index(min_role)
