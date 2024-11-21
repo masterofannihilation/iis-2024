@@ -51,8 +51,8 @@
             {% else %}
                 {% if request.resolver_match.url_name != 'login' %}
                     <a class="btn btn-primary btn-md me-2" href="{% url 'login' %}">Log in</a>
-                    <a class="btn btn-secondary btn-md" href="{% url 'register' %}">Register</a>
                 {% endif %}
+                <a class="btn btn-secondary btn-md" href="{% url 'register' %}">Register</a>
             {% endif %}
         </div>
 

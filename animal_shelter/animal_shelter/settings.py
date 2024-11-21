@@ -70,6 +70,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_auto_logout.middleware.auto_logout",
 ]
 
 ROOT_URLCONF = "animal_shelter.urls"
@@ -172,3 +173,11 @@ AUTH_USER_MODEL = "shelter.User"
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
+
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+AUTO_LOGOUT = {
+    "SESSION_TIME": 10 * 60,  # 10 minutes
+    "MESSAGE": "You have been automatically logged out due to inactivity.",
+}
