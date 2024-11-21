@@ -81,6 +81,7 @@ class Walk(models.Model):
         APPROVED = "Approved", "Approved"
         BORROWED = "Borrowed", "Borrowed"
         RETURNED = "Returned", "Returned"
+        AVAILABLE = "Available", "Available"
 
     animal = models.ForeignKey(Animal, on_delete=models.CASCADE, related_name="walks")
     volunteer = models.ForeignKey(
@@ -105,6 +106,12 @@ class Walk(models.Model):
 
     def __str__(self):
         return f"{self.animal.name} walk at {self.begin_time}"
+    
+    def can_be_chosen_by_volunteer(self):
+        return self.status == self.Status.AVAILABLE
+
+    def can_be_approved_by_caregiver(self):
+        return self.status == self.Status.RESERVED
 
 
 class VeterinarianRequest(models.Model):

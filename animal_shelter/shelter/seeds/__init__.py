@@ -18,3 +18,10 @@ def seed_demo_data():
     for data in seeds:
         for entry in data:
             entry.save()
+
+    from .walks import WALK_SEEDS
+
+    seeds =  (WALK_SEEDS,)
+    for data in seeds:
+        for entry in data:
+            entry.save()

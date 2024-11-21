@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<h1>Create a New Walk</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{% url 'walks_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% endblock %}
