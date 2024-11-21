@@ -100,8 +100,6 @@ def walks_list(request):
         },
     )
 
-
-
 @login_required
 @user_can_manage_walks
 def walk_create(request):
@@ -154,3 +152,11 @@ def choose_walk(request, walk_id):
         return redirect('walks_list')
     
     return render(request, 'walks/choose.html', {'walk': walk})
+
+@login_required
+def walk_history(request):
+    if request.user.role != User.Role.VOLUNTEER:
+        return HttpResponseForbidden("Access Denied: Only volunteers can view their walk history.")
+    
+    walks = Walk.objects.filter(volunteer=request.user).order_by('-begin_time')
+    return render(request, 'walks/history.html', {'walks': walks})

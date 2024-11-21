@@ -24,7 +24,7 @@ WALK_SEEDS = (
     Walk(
         id=1_003_002,
         animal_id=1_002_002,  # Hopper
-        volunteer_id=1_001_024,  # Ignatius Lowery
+        volunteer_id=1_001_008,  # Ignatius Lowery
         caregiver_id=1_001_006,  # Evelyn Zimmerman
         begin_time=datetime.datetime(2023, 9, 16, 8, 0, tzinfo=pytz.UTC),  # Include time and timezone
         end_time=datetime.datetime(2023, 9, 16, 10, 0, tzinfo=pytz.UTC),  # Include time and timezone
@@ -42,7 +42,7 @@ WALK_SEEDS = (
     Walk(
         id=1_003_004,
         animal_id=1_002_004,  # Mittens
-        volunteer_id=1_001_016,  # Catherine Logan
+        volunteer_id=1_001_008,  # Catherine Logan
         caregiver_id=1_001_014,  # Priscilla Barnes
         begin_time=datetime.datetime(2023, 7, 6, 6, 0, tzinfo=pytz.UTC),  # Include time and timezone
         end_time=datetime.datetime(2023, 7, 6, 8, 0, tzinfo=pytz.UTC),  # Include time and timezone
