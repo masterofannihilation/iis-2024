@@ -48,6 +48,8 @@ class UserEditForm(ModelForm):
                 (User.Role.VOLUNTEER, User.Role.VOLUNTEER),
                 (User.Role.UNVERIFIED, User.Role.UNVERIFIED),
             ]
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
 
     def clean_role(self):
         role = self.cleaned_data.get("role")
@@ -101,6 +103,9 @@ class ProfileEditForm(ModelForm):
     class Meta:
         model = User
         fields = ["email", "contact_info"]
+        widgets = {
+            "email": EmailInput(attrs={"class": "form-control"}),
+        }
 
 
 def user_can_manage_users(view_func):

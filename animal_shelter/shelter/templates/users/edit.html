@@ -1,14 +1,68 @@
 {% extends 'base.html' %}
 
-{% block title %}Edit user{% endblock %}
+{% block title %}Edit User{% endblock %}
 
 {% block content %}
-<h1>Edit User</h1>
+<div class="container" style="max-width: 600px;">
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Save Changes</button>
-    <a href="{% url 'user_detail' id=user.id %}" class="btn btn-danger">Cancel</a>
-</form>
+    <div class="card shadow-sm p-4">
+        {% if form.username.value %}
+            <h1 class="text-center mb-4">Edit User</h1>
+        {% else %}
+            <h1 class="text-center mb-4">Edit Profile</h1>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.username.value %}
+            <div class="mb-3">
+                <label for="id_username" class="form-label">Username</label>
+                {{ form.username }}
+            </div>
+            {% endif %}
+
+            {% if form.first_name.value %}
+            <div class="mb-3">
+                <label for="id_first_name" class="form-label">First Name</label>
+                {{ form.first_name }}
+            </div>
+            {% endif %}
+
+            {% if form.last_name.value %}
+            <div class="mb-3">
+                <label for="id_last_name" class="form-label">Last Name</label>
+                {{ form.last_name }}
+            </div>
+            {% endif %}
+
+            {% if form.email.value %}
+            <div class="mb-3">
+                <label for="id_email" class="form-label">Email</label>
+                {{ form.email }}
+            </div>
+            {% endif %}
+
+            {% if form.role.value %}
+            <div class="mb-3">
+                <label for="id_role" class="form-label">Role</label>
+                {{ form.role }}
+            </div>
+            {% endif %}
+
+            {% if form.contact_info.value %}
+            <div class="mb-3">
+                <label for="id_contact_info" class="form-label">Contact</label>
+                <input type="text" name="contact_info" id="id_contact_info" class="form-control" style="max-width: 600px;" value="{{ form.contact_info.value }}">
+            </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-success">Save Changes</button>
+                <a href="{% url 'user_detail' id=user.id %}" class="btn btn-danger">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
 {% endblock %}

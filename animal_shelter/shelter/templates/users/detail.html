@@ -1,42 +1,52 @@
 {% extends "base.html" %}
 
-{% block title %}{% if profile_page %}Your profile{% else %}{{ user.username }} - Profile detail{% endif %}{% endblock %}
+{% block title %}{% if profile_page %}Your Profile{% else %}{{ user.username }} - Profile Detail{% endif %}{% endblock %}
 
 {% block content %}
 
-{% if profile_page %}
-<h1>Detail of your profile</h1>
-{% else %}
-<h1>Detail of {{ user.username }}'s profile</h1>
-{% endif %}
+<div class="container" style="max-width: 800px; ">
+    <div class="card shadow">
+        <div class="card-body">
+            {% if profile_page %}
+            <h1 class="text-center mb-4">Your Profile</h1>
+            {% else %}
+            <h1 class="text-center mb-4">{{ user.username }}'s Profile</h1>
+            {% endif %}
 
-<p><strong>Username:</strong> {{ user.username }}</p>
-<p><strong>First Name:</strong> {{ user.first_name }}</p>
-<p><strong>Last Name:</strong> {{ user.last_name }}</p>
-<p><strong>Email:</strong> {{ user.email }}</p>
-<p><strong>Contact:</strong> {{ user.contact }}</p>
-<p><strong>Role:</strong> {{ user.role }}</p>
-<p><strong>Status:</strong> {{ user.is_active|yesno:"Active,Banned" }}</p>
+            <ul class="list-group list-group-flush mb-4">
+                <li class="list-group-item"><strong>Username:</strong> {{ user.username }}</li>
+                <li class="list-group-item"><strong>First Name:</strong> {{ user.first_name }}</li>
+                <li class="list-group-item"><strong>Last Name:</strong> {{ user.last_name }}</li>
+                <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
+                <li class="list-group-item"><strong>Contact:</strong> {{ user.contact }}</li>
+                <li class="list-group-item"><strong>Role:</strong> {{ user.role }}</li>
+                <li class="list-group-item"><strong>Status:</strong> {{ user.is_active|yesno:"Active,Banned" }}</li>
+            </ul>
 
-{% if profile_page %}
-    <a class="btn btn-primary" href="{% url 'profile_edit' %}">Edit</a>
-    <a class="btn btn-secondary" href="{% url 'change_password' %}">Change password</a>
-{% else %}
-    {% if user.modifiable or logged_in_admin %}                        
-        <a class="btn btn-primary" href="{% url 'user_edit' id=user.id %}">Edit</a>
-        {% if user.modifiable %}
-        <a class="btn btn-secondary" href="{% url 'reset_password' id=user.id %}">Reset password</a>
-        {% endif %}
-    {% endif %}
-    <a class="btn btn-info" href="{% url 'users_list' %}">Go back</a>
-{% endif %}
+            <div class="d-flex justify-content-center gap-2">
+                {% if profile_page %}
+                    <a class="btn btn-primary" href="{% url 'profile_edit' %}">Edit</a>
+                    <a class="btn btn-secondary" href="{% url 'change_password' %}">Change Password</a>
+                {% else %}
+                    {% if user.modifiable or logged_in_admin %}
+                        <a class="btn btn-primary" href="{% url 'user_edit' id=user.id %}">Edit</a>
+                        {% if user.modifiable %}
+                        <a class="btn btn-secondary" href="{% url 'reset_password' id=user.id %}">Reset Password</a>
+                        {% endif %}
+                    {% endif %}
+                    <a class="btn btn-info" href="{% url 'users_list' %}">Go Back</a>
+                {% endif %}
+            </div>
 
-{% if messages %}
-<ul>
-    {% for message in messages %}
-    <li class="alert alert-{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+            {% if messages %}
+            <ul class="mt-4">
+                {% for message in messages %}
+                <li class="alert alert-{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
 {% endblock %}
