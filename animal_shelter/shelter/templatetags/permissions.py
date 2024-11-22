@@ -29,3 +29,8 @@ def is_volunteer(user):
 def is_vet(user):
     """Check if the user is a veterinarian."""
     return user.role == User.Role.VETERINARIAN
+
+@register.filter
+def can_manage_walks(user):
+    """Check if the user can manage walks."""
+    return user.role in [User.Role.CAREGIVER, User.Role.ADMINISTRATOR]

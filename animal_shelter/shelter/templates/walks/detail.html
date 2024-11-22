@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+{% load permissions %}
+{% load static %}
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Image Container -->
+        <div class="col-md-6 mb-4">
+            <div class="border rounded" style="max-height: 500px; overflow: hidden;">
+                <img src="{% if walk.animal.image_url %}{{ walk.animal.image_url }}{% else %}{% static 'images/default_animal.png' %}{% endif %}"
+                    class="img-fluid" style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+        </div>
+
+        <!-- Walk Details -->
+        <div class="col-md-6">
+            <h1>{{ walk.animal.name }}</h1>
+            <p class="fs-5"><strong>Volunteer:</strong> {{ walk.volunteer.username }}</p>
+            <p class="fs-5"><strong>Caregiver:</strong> {{ walk.caregiver.username }}</p>
+            <p class="fs-5"><strong>Begin Time:</strong> {{ walk.begin_time }}</p>
+            <p class="fs-5"><strong>End Time:</strong> {{ walk.end_time }}</p>
+            <p class="fs-5"><strong>Status:</strong> {{ walk.get_status_display }}</p>
+
+            <!-- Action Buttons -->
+            {% if user.is_authenticated %}
+            <div class="walk-actions-detail d-flex align-items-start mt-3">
+                <form class="d-flex align-items-center" method="post">
+                    {% csrf_token %}
+                    {% if user|can_manage_walks %}
+                        <a href="{% url 'walk_edit' walk.id %}" class="btn btn-warning btn-lg me-2">Edit</a>
+                        <button type="submit" formaction="{% url 'walk_delete' walk.id %}" class="btn btn-danger btn-lg">
+                            Delete
+                        </button>
+                    {% endif %}
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Walk Description -->
+    <div class="mt-5">
+        <div class="p-4 border rounded bg-light">
+            <p class="fs-5">{{ walk.description }}</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

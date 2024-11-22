@@ -32,6 +32,10 @@
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'animals_list' %}active{% endif %}" href="{% url 'animals_list' %}">Animals</a>
             </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'walks_list' %}">Walks</a>
+                </li>
             {% if logged_in_user|can_manage_users %}
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'users_list' %}active{% endif %}" href="{% url 'users_list' %}">Users</a>

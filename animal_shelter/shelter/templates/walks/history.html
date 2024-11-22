@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">My Walk History</h1>
+
+    {% if walks %}
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Animal</th>
+                    <th>Begin Time</th>
+                    <th>End Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for walk in walks %}
+                    <tr>
+                        <td>{{ walk.animal.name }}</td>
+                        <td>{{ walk.begin_time }}</td>
+                        <td>{{ walk.end_time }}</td>
+                        <td>{{ walk.get_status_display }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            You have no walk history.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

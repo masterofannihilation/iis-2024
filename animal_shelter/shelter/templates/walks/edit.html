@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Edit Walk</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            {% if form.instance.animal.image_url %}
+                <img src="{{ form.instance.animal.image_url }}" alt="{{ form.instance.animal.name }}" class="img-fluid rounded border">
+            {% else %}
+                <div class="d-flex align-items-center justify-content-center bg-light border rounded" style="height: 200px;">
+                    <span>No Image</span>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-flex justify-content-start">
+                    <button type="submit" class="btn btn-primary me-2">Save</button>
+                    <a href="{% url 'walks_list' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

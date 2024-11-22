@@ -1,6 +1,100 @@
-<h1>Walking Schedule</h1>
-<ul>
-    {% for walk in walks %}
-        <li>{{ walk.animal.name }} - {{ walk.scheduled_time }} - {{ walk.status }}</li>
-    {% endfor %}
-</ul>
+{% extends "base.html" %}
+{% load permissions %}
+
+{% block title %}Walking Schedule{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Walking Schedule</h1>
+
+    <!-- Filter Form -->
+    <form method="get" class="row g-3 align-items-center mb-4">
+        <div class="col-auto">
+            <input type="date" name="time" placeholder="Filter by date" value="{{ request.GET.time }}" class="form-control">
+        </div>
+        <div class="col-auto">
+            <select name="species" class="form-select">
+                <option value="">All Species</option>
+                {% for species in species_list %}
+                    <option value="{{ species }}" {% if species == request.GET.species %}selected{% endif %}>{{ species }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                {% for status in status_list %}
+                    <option value="{{ status.0 }}" {% if status.0 == request.GET.status %}selected{% endif %}>{{ status.1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+        {% if user.is_authenticated and user.role == 'Volunteer' %}
+        <div class="col-auto">
+            <a href="{% url 'walk_history' %}" class="btn btn-info">My Walk History</a>
+        </div>
+        {% endif %}
+        {% if user.is_authenticated and user.role == 'Caregiver' %}
+        <div class="col-auto">
+            <a href="{% url 'walk_create' %}" class="btn btn-success">Create Walk</a>
+        </div>
+        {% endif %}
+    </form>
+
+    <div class="walk-list">
+        {% for date, walks in walks_grouped %}
+            <h2 class="mt-4">{{ date }}</h2>
+            {% for walk in walks %}
+                <div class="walk-item d-flex align-items-center mb-4 p-3 border rounded">
+                    <a href="{% url 'walk_detail' walk.id %}" class="d-flex flex-grow-1 align-items-center text-decoration-none">
+                        {% if walk.animal.image_url %}
+                            <img src="{{ walk.animal.image_url }}" alt="{{ walk.animal.name }}" class="animal-image me-3" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10px;">
+                        {% else %}
+                            <div class="animal-placeholder me-3" style="width: 100px; height: 100px; background-color: #ddd; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
+                                <span>No Image</span>
+                            </div>
+                        {% endif %}
+                        <div class="walk-details ms-4">
+                            <h3 class="text-dark mb-0" style="line-height: 1.2;">{{ walk.animal.name }}</h3>
+                            <p class="text-muted mt-1 mb-0">Volunteer: {{ walk.volunteer.username }}</p>
+                            <p class="text-muted mt-1 mb-0">Caregiver: {{ walk.caregiver.username }}</p>
+                            <p class="text-muted mt-1 mb-0">Begin Time: {{ walk.begin_time }}</p>
+                            <p class="text-muted mt-1 mb-0">End Time: {{ walk.end_time }}</p>
+                            <p class="text-muted mt-1 mb-0">Status: {{ walk.get_status_display }}</p>
+                        </div>
+                    </a>
+                    {% if user.is_authenticated %}
+                    <div class="walk-actions ms-3">
+                        {% if user.role == 'Volunteer' and walk.can_be_chosen_by_volunteer %}
+                            <form method="post" action="{% url 'walks_list' %}" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="walk_id" value="{{ walk.id }}">
+                                <input type="hidden" name="action" value="choose">
+                                <button type="submit" class="btn btn-primary btn-sm">Choose</button>
+                            </form>
+                        {% endif %}
+                        {% if user.role == 'Caregiver' and walk.can_be_approved_by_caregiver %}
+                            <form method="post" action="{% url 'walks_list' %}" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="walk_id" value="{{ walk.id }}">
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                        {% endif %}
+                        {% if user|can_manage_walks %}
+                            <a href="{% url 'walk_edit' walk.id %}" class="btn btn-warning btn-sm">Edit</a>
+                            <form method="post" action="{% url 'walk_delete' walk.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
