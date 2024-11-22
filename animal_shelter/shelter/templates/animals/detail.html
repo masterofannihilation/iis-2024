@@ -26,7 +26,7 @@
                 {% elif user|is_vet %}
                     <a href="#" class="btn btn-info btn-lg me-2">Health records</a>
                 {% elif user|can_manage_animals %}
-                    <a href="#" class="btn btn-info btn-lg me-2">Walk schedule</a>
+                <a href="{% url 'walks_list' id=animal.id %}" class="btn btn-info btn-lg me-2">Walk schedule</a>
                     <a href="#" class="btn btn-info btn-lg me-2">Vet requests</a>
                     <a href="{% url 'animal_edit' animal.id %}" class="btn btn-warning btn-lg me-2">Edit</a>
                     <button type="submit" formaction="{% url 'animal_delete' animal.id %}" class="btn btn-danger btn-lg">
