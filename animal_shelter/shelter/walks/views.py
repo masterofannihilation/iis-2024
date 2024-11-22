@@ -1,26 +1,32 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.forms import ModelForm, DateInput
+from django.forms import ModelForm, DateTimeInput
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from functools import wraps
 from collections import defaultdict
 from ..models import Walk, Animal, User
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 
-
 class WalkForm(ModelForm):
     class Meta:
         model = Walk
         fields = ['animal', 'volunteer', 'caregiver', 'begin_time', 'end_time', 'status']
         widgets = {
-            'begin_time': DateInput(attrs={'type': 'date'}),
-            'end_time': DateInput(attrs={'type': 'date'}),
+            'begin_time': DateTimeInput(attrs={'type': 'datetime-local'}),
+            'end_time': DateTimeInput(attrs={'type': 'datetime-local'}),
         }
     
-    # Custom validation to ensure end_time is after begin_time
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.instance.pk:
+            self.fields['status'].initial = Walk.Status.AVAILABLE
+
+    # Custom validation to ensure end_time is after begin_time and no overlapping walks
     def clean(self):
         cleaned_data = super().clean()
+        animal = cleaned_data.get("animal")
         begin_time = cleaned_data.get("begin_time")
         end_time = cleaned_data.get("end_time")
 
@@ -28,6 +34,17 @@ class WalkForm(ModelForm):
             raise ValidationError({
                 'end_time': _("End time must be after begin time.")
             })
+
+        # Check for overlapping walks
+        if animal and begin_time and end_time:
+            overlapping_walks = Walk.objects.filter(
+                animal=animal,
+                begin_time__lt=end_time,
+                end_time__gt=begin_time
+            ).exclude(id=self.instance.id)
+            
+            if overlapping_walks.exists():
+                raise ValidationError(_("This walk overlaps with another walk for the same animal."))
 
 def user_can_manage_walks(view_func):
     @wraps(view_func)
@@ -38,7 +55,7 @@ def user_can_manage_walks(view_func):
     return wrapper
 
 @login_required
-def walks_list(request):
+def walks_list(request, id=None):
     if request.method == 'POST':
         walk_id = request.POST.get('walk_id')
         action = request.POST.get('action')
@@ -60,15 +77,23 @@ def walks_list(request):
 
         return redirect('walks_list')
     
-    walks = Walk.objects.all()
+    # Filter walks to include only upcoming walks
+    walks = Walk.objects.filter(begin_time__gte=timezone.now())
 
-    # Apply filters only if specified
-    time_filter = request.GET.get("time", "")
+    # Filter by animal if animal_id is provided
+    if id:
+        walks = walks.filter(animal_id=id)
+
+    # Apply additional filters if specified
+    start_date = request.GET.get("start_date", "")
+    end_date = request.GET.get("end_date", "")
     species_filter = request.GET.get("species", "")
     status_filter = request.GET.get("status", "")
 
-    if time_filter:
-        walks = walks.filter(begin_time__date=time_filter)  # Matches specific date
+    if start_date:
+        walks = walks.filter(begin_time__date__gte=start_date)
+    if end_date:
+        walks = walks.filter(begin_time__date__lte=end_date)
     if species_filter:
         walks = walks.filter(animal__species=species_filter)
     if status_filter:
@@ -94,9 +119,11 @@ def walks_list(request):
             "walks_grouped": walks_grouped,
             "species_list": species_list,
             "status_list": status_list,
-            "time_filter": time_filter,
+            "start_date": start_date,
+            "end_date": end_date,
             "species_filter": species_filter,
             "status_filter": status_filter,
+            "animal_id": id,
         },
     )
 

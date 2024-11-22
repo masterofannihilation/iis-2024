@@ -80,8 +80,8 @@ WALK_SEEDS = (
         animal_id=1_002_000,  # Rex
         volunteer_id=None,  # No volunteer assigned
         caregiver_id=1_001_002,  # Tamara Pollar
-        begin_time=datetime.datetime(2023, 12, 2, 10, 0, tzinfo=pytz.UTC),  # Future date
-        end_time=datetime.datetime(2023, 12, 2, 12, 0, tzinfo=pytz.UTC),  # Future date
+        begin_time=datetime.datetime(2025, 12, 2, 10, 0, tzinfo=pytz.UTC),  # Future date
+        end_time=datetime.datetime(2025, 12, 2, 12, 0, tzinfo=pytz.UTC),  # Future date
         status=Walk.Status.AVAILABLE,
     ),
     Walk(
@@ -89,9 +89,63 @@ WALK_SEEDS = (
         animal_id=1_002_001,  # Jambo
         volunteer_id=None,  # No volunteer assigned
         caregiver_id=1_001_003,  # Upton Harvey
-        begin_time=datetime.datetime(2023, 12, 3, 9, 0, tzinfo=pytz.UTC),  # Future date
-        end_time=datetime.datetime(2023, 12, 3, 11, 0, tzinfo=pytz.UTC),  # Future date
+        begin_time=datetime.datetime(2025, 12, 2, 9, 0, tzinfo=pytz.UTC),  # Future date
+        end_time=datetime.datetime(2025, 12, 2, 11, 0, tzinfo=pytz.UTC),  # Future date
         status=Walk.Status.AVAILABLE,
     ),   
+    Walk(
+        id=1_003_010,
+        animal_id=1_002_002,  # Hopper
+        volunteer_id=None,  # No volunteer assigned
+        caregiver_id=1_001_006,  # Evelyn Zimmerman
+        begin_time=datetime.datetime(2025, 12, 4, 8, 0, tzinfo=pytz.UTC),  # Future date
+        end_time=datetime.datetime(2025, 12, 4, 10, 0, tzinfo=pytz.UTC),  # Future date
+        status=Walk.Status.AVAILABLE,
+    ),
+    Walk(
+        id=1_003_011,
+        animal_id=1_002_003,  # Shadow
+        volunteer_id=None,  # No volunteer assigned
+        caregiver_id=1_001_010,  # Nayda Moses
+        begin_time=datetime.datetime(2025, 12, 5, 7, 0, tzinfo=pytz.UTC),  # Future date
+        end_time=datetime.datetime(2025, 12, 5, 9, 0, tzinfo=pytz.UTC),  # Future date
+        status=Walk.Status.AVAILABLE,
+    ),
+    Walk(
+        id=1_003_012,
+        animal_id=1_002_004,  # Mittens
+        volunteer_id=None,  # No volunteer assigned
+        caregiver_id=1_001_014,  # Priscilla Barnes
+        begin_time=datetime.datetime(2025, 12, 6, 6, 0, tzinfo=pytz.UTC),  # Future date
+        end_time=datetime.datetime(2025, 12, 6, 8, 0, tzinfo=pytz.UTC),  # Future date
+        status=Walk.Status.AVAILABLE,
+    ),
+    Walk(
+        id=1_003_013,
+        animal_id=1_002_005,  # Bunny
+        volunteer_id=None,  # No volunteer assigned
+        caregiver_id=1_001_022,  # Amity Dudley
+        begin_time=datetime.datetime(2025, 12, 7, 5, 0, tzinfo=pytz.UTC),  # Future date
+        end_time=datetime.datetime(2025, 12, 7, 7, 0, tzinfo=pytz.UTC),  # Future date
+        status=Walk.Status.AVAILABLE,
+    ),
+    Walk(
+        id=1_003_014,
+        animal_id=1_002_006,  # Patches
+        volunteer_id=None,  # No volunteer assigned
+        caregiver_id=1_001_004,  # Rae Blake
+        begin_time=datetime.datetime(2025, 12, 8, 4, 0, tzinfo=pytz.UTC),  # Future date
+        end_time=datetime.datetime(2025, 12, 8, 6, 0, tzinfo=pytz.UTC),  # Future date
+        status=Walk.Status.AVAILABLE,
+    ),
+    Walk(
+        id=1_003_015,
+        animal_id=1_002_007,  # Bolt
+        volunteer_id=None,  # No volunteer assigned
+        caregiver_id=1_001_019,  # Neil Fox
+        begin_time=datetime.datetime(2025, 12, 9, 3, 0, tzinfo=pytz.UTC),  # Future date
+        end_time=datetime.datetime(2025, 12, 9, 5, 0, tzinfo=pytz.UTC),  # Future date
+        status=Walk.Status.AVAILABLE,
+    )
     
 )

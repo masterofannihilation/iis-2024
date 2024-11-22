@@ -25,6 +25,7 @@ urlpatterns = [
     path("animals/<int:id>/", animal_views.animal_detail, name="animal_detail"),
     path("animals/<int:id>/edit/", animal_views.animal_edit, name="animal_edit"),
     path("animals/<int:id>/delete/", animal_views.animal_delete, name="animal_delete"),
+    path("animals/<int:id>/walks/", walk_views.walks_list, name="walks_list"),
     path("walks/", walk_views.walks_list, name="walks_list"),
     path("walks/create/", walk_views.walk_create, name="walk_create"),
     path("walks/<int:walk_id>/", walk_views.walk_detail, name="walk_detail"),

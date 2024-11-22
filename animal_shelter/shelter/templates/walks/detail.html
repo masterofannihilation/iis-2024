@@ -3,48 +3,47 @@
 {% load permissions %}
 {% load static %}
 
-<div class="container mt-4">
-    <div class="row">
-        <!-- Image Container -->
-        <div class="col-md-6 mb-4">
-            <div class="border rounded" style="max-height: 500px; overflow: hidden;">
-                <img src="{% if walk.animal.image_url %}{{ walk.animal.image_url }}{% else %}{% static 'images/default_animal.png' %}{% endif %}"
-                    class="img-fluid" style="width: 100%; height: 100%; object-fit: contain;">
-            </div>
-        </div>
-
-        <!-- Walk Details -->
-        <div class="col-md-6">
-            <h1>{{ walk.animal.name }}</h1>
-            <p class="fs-5"><strong>Volunteer:</strong> {{ walk.volunteer.username }}</p>
-            <p class="fs-5"><strong>Caregiver:</strong> {{ walk.caregiver.username }}</p>
-            <p class="fs-5"><strong>Begin Time:</strong> {{ walk.begin_time }}</p>
-            <p class="fs-5"><strong>End Time:</strong> {{ walk.end_time }}</p>
-            <p class="fs-5"><strong>Status:</strong> {{ walk.get_status_display }}</p>
-
-            <!-- Action Buttons -->
-            {% if user.is_authenticated %}
-            <div class="walk-actions-detail d-flex align-items-start mt-3">
-                <form class="d-flex align-items-center" method="post">
-                    {% csrf_token %}
-                    {% if user|can_manage_walks %}
-                        <a href="{% url 'walk_edit' walk.id %}" class="btn btn-warning btn-lg me-2">Edit</a>
-                        <button type="submit" formaction="{% url 'walk_delete' walk.id %}" class="btn btn-danger btn-lg">
-                            Delete
-                        </button>
-                    {% endif %}
-                </form>
-            </div>
-            {% endif %}
-        </div>
+<div style="display: flex; justify-content: center; align-items: center; gap: 5%; padding: 20px; width: 100%; max-width: 1600px; margin: 0 auto; flex-wrap: wrap; box-sizing: border-box;">
+    <!-- Image Container -->
+    <div style="flex-shrink: 0; max-width: 600px; max-height: 500px; width: 50vw; height: 50vw; display: flex; align-items: left; justify-content: left; border: 1px solid #ffffff;">
+        <img src="{% if walk.animal.image_url %}{{ walk.animal.image_url }}{% else %}{% static 'images/default_animal.png' %}{% endif %}"
+            style="width: 100%; height: 100%; object-fit: contain;">
     </div>
 
-    <!-- Walk Description -->
-    <div class="mt-5">
-        <div class="p-4 border rounded bg-light">
-            <p class="fs-5">{{ walk.description }}</p>
+    <!-- Walk Details -->
+    <div style="flex-grow: 1; text-align: left; max-width: 600px;">
+        <h1 style="margin: 0; font-size: 3.5rem;">{{ walk.animal.name }}</h1>
+        {% if walk.volunteer != none %}
+            <p style="font-size: 1.8rem; margin: 10px 0;"><strong>Volunteer:</strong> {{ walk.volunteer.first_name }} {{ walk.volunteer.last_name }} ({{ walk.volunteer.username }})</p>
+        {% else %}
+            <p style="font-size: 1.8rem; margin: 10px 0;"><strong>Volunteer:</strong></p>
+        {% endif %}
+        <p style="font-size: 1.8rem; margin: 10px 0;"><strong>Caregiver:</strong> {{ walk.caregiver.first_name }} {{ walk.caregiver.last_name }} ({{ walk.caregiver.username }})</p>
+        <p style="font-size: 1.8rem; margin: 10px 0;"><strong>Begin Time:</strong> {{ walk.begin_time }}</p>
+        <p style="font-size: 1.8rem; margin: 10px 0;"><strong>End Time:</strong> {{ walk.end_time }}</p>
+        <p style="font-size: 1.8rem; margin: 10px 0;"><strong>Status:</strong> {{ walk.get_status_display }}</p>
+
+        <!-- Action Buttons -->
+        {% if user.is_authenticated %}
+        <div class="walk-actions-detail d-flex align-items-start">
+            <form class="d-flex align-items-center" method="post">
+                {% csrf_token %}
+                {% if user|can_manage_walks %}
+                    <a href="{% url 'walk_edit' walk.id %}" class="btn btn-warning btn-lg me-2">Edit</a>
+                    <button type="submit" formaction="{% url 'walk_delete' walk.id %}" class="btn btn-danger btn-lg me-2">
+                        Delete
+                    </button>
+                {% endif %}
+                <a href="{% url 'walks_list' id=walk.animal.id %}" class="btn btn-info btn-lg me-2">Walk Schedule</a>
+            </form>
         </div>
+        {% endif %}
     </div>
+</div>
+
+<!-- Walk Description -->
+<div style="margin-top: 50px; padding: 30px; font-size: 1.8rem; max-width: 1400px; margin: 0 auto; text-align: justify;">
+    <p>{{ walk.description }}</p>
 </div>
 
 {% endblock %}
