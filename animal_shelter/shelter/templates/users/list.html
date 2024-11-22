@@ -3,18 +3,13 @@
 {% block title %}Manage Users{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-
-    <div class="container py-3">
-        <div class="row align-items-center justify-content-between">
-            <!-- Header aligned to the left -->
-            <div class="col-auto">
-                <h2 class="mb-0">Registered Users</h2>
-            </div>
-            <!-- Button aligned to the right -->
-            <div class="col-auto">
-                <a href="{% url 'user_create' %}" class="btn btn-primary">Create new user</a>
-            </div>
+<div class="container mt-2">
+    <div class="row align-items-center justify-content-between py-3">
+        <div class="col-auto">
+            <h1 class="mb-0">Registered Users</h1>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'user_create' %}" class="btn btn-primary">Create new user</a>
         </div>
     </div>
 
@@ -22,28 +17,28 @@
         <div class="row mb-3">
             <div class="col">
                 <label for="username" class="form-label">Username</label>
-                <input type="text" id="username" name="username" value="{{ filters_page.username }}" 
+                <input type="text" id="username" name="username" value="{{ filters_page.username }}"
                     placeholder="Search by username" class="form-control">
             </div>
-    
+
             <div class="col">
                 <label for="first_name" class="form-label">First Name</label>
-                <input type="text" id="first_name" name="first_name" value="{{ filters_page.first_name }}" 
+                <input type="text" id="first_name" name="first_name" value="{{ filters_page.first_name }}"
                     placeholder="Search by first name" class="form-control">
             </div>
-    
+
             <div class="col">
                 <label for="last_name" class="form-label">Last Name</label>
-                <input type="text" id="last_name" name="last_name" value="{{ filters_page.last_name }}" 
+                <input type="text" id="last_name" name="last_name" value="{{ filters_page.last_name }}"
                     placeholder="Search by last name" class="form-control">
             </div>
-    
+
             <div class="col">
                 <label for="email" class="form-label">Email</label>
-                <input type="text" id="email" name="email" value="{{ filters_page.email }}" 
+                <input type="text" id="email" name="email" value="{{ filters_page.email }}"
                     placeholder="Search by email" class="form-control">
             </div>
-    
+
             <div class="col">
                 <label for="filter_role" class="form-label">Role</label>
                 <select class="form-select" id="filter_role" name="filter_role">
@@ -53,9 +48,9 @@
                     <option value="Veterinarian"{% if filters_page.filter_role == "Veterinarian" %}selected{% endif %}>Veterinarian</option>
                     <option value="Volunteer"{% if filters_page.filter_role == "Volunteer" %}selected{% endif %}>Volunteer</option>
                     <option value="Unverified"{% if filters_page.filter_role == "Unverified" %}selected{% endif %}>Unverified</option>
-                </select>    
+                </select>
             </div>
-    
+
             <div class="col">
                 <label class="form-label d-block" style="visibility: hidden;">Search</label>
                 <button class="btn btn-primary w-100" type="submit" name="search" value="search">Search</button>
@@ -152,7 +147,7 @@
             <li class="page-item disabled">
                 <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
             </li>
-    
+
             <!-- Previous Button -->
             {% if page_obj.has_previous %}
             <li class="page-item">
@@ -165,7 +160,7 @@
                 <span class="page-link">&laquo; Previous</span>
             </li>
             {% endif %}
-    
+
             <!-- Next Button -->
             {% if page_obj.has_next %}
             <li class="page-item">
