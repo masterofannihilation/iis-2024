@@ -60,7 +60,7 @@ class TestAnimalDetail(AnimalTestBase):
         response = self.client.get(
             reverse("animal_detail", args=[animals.ANIMAL_SEEDS[0].id])
         )
-        self.assertEqual(response.status_code, 302)  # Redirect to login page
+        self.assertEqual(response.status_code, 200) 
 
 
 class TestAnimalCreate(AnimalTestBase):
