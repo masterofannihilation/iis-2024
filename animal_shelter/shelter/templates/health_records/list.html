@@ -4,11 +4,10 @@
 {% load static %}
 
 <div class="container mt-4">
-    <h1 class="mb-4" >Animals</h1>
+    <h1 class="mb-4">Health Records</h1>
 
     <!-- Filter Form -->
     <form method="get" class="d-flex align-items-center gap-3">
-        <input type="text" name="name" class="form-control d-inline-block w-auto" placeholder="Search by name" value="{{ request.GET.name }}">
         <select name="species" class="form-select d-inline-block w-auto">
             <option value="">All Species</option>
             {% for species in species_list %}
@@ -16,19 +15,18 @@
             {% endfor %}
         </select>
         <button type="submit" class="btn btn-primary">Search</button>
-
-        <!-- Add animal -->
-        {% if user.is_authenticated and user|can_manage_animals %}
-            <a href="{% url 'animal_create' %}" class="btn btn-success">Add Animal</a>
+        {% if logged_in_user|can_create_health_records %}
+        <div class="col-auto">
+            <a href="{% url 'health_records_create' %}" class="btn btn-success">Create Request</a>
+        </div>
         {% endif %}
-</form>
-
+    </form>
 
     <div class="animal-list">
         {% for animal in animals %}
             <div class="animal-item d-flex position-relative mb-4 p-3 border rounded">
                 <!-- Clickable area -->
-                <a href="{% url 'animal_detail' animal.id %}" class="animal-item-link d-flex flex-grow-1">
+                <a href="{% url 'health_records_detail' animal.id %}" class="animal-item-link d-flex flex-grow-1">
                     <!-- Image -->
                     <div class="animal-image-container">
                         <img src="{% if animal.image_url %}{{ animal.image_url }}{% else %}{% static 'images/default_animal.png' %}{% endif %}"
@@ -48,24 +46,9 @@
                 <div class="animal-actions ms-3 d-flex align-items-end">
                     <form class="d-flex align-items-center" method="post">
                         {% csrf_token %}
-                        {% if user|is_volunteer %}
-                            <a href="{% url 'walks_list' id=animal.id %}" class="btn btn-info btn-sm me-2">Schedule a walk</a>
-                        {% elif user|is_vet %}
-                            <a href="#" class="btn btn-info btn-sm me-2">Health records</a>
-                        {% elif user|can_manage_animals %}
-                            <a href="{% url 'walks_list' id=animal.id %}" class="btn btn-info btn-sm me-2">Walk schedule</a>
-                            <a href="{% url 'health_records_detail' id=animal.id %}" class="btn btn-info btn-sm me-2">Vet requests</a>
-                            {% comment %} <a href="#" class="btn btn-info btn-sm me-2">Vet requests</a> {% endcomment %}
-                            <a href="{% url 'animal_edit' animal.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
-                            <button type="submit" formaction="{% url 'animal_delete' animal.id %}" class="btn btn-danger btn-sm">
-                                Delete
-                            </button>
-                        {% endif %}
                     </form>
                 </div>
                 {% endif %}
-
-
             </div>
         {% endfor %}
     </div>
