@@ -1,7 +1,8 @@
 {% extends "base.html" %}
-{% block content %}
 {% load permissions %}
 {% load static %}
+{% block title %}Health Record{% endblock %}
+{% block content %}
 
 <div class="container mt-4">
     <!-- Animal Details and Create Request Button -->
@@ -24,7 +25,7 @@
         <!-- Create Request Button -->
         {% if logged_in_user|can_create_health_records %}
         <div>
-            <a href="{% url 'health_records_create' %}" class="btn btn-success">Create Request</a>
+            <a href="{% url 'health_records_create' animal.id %}" class="btn btn-success">Create Request</a>
         </div>
         {% endif %}
     </div>
@@ -50,19 +51,19 @@
                         </div>
                         <div class="record-actions ms-3">
                             {% if user|can_manage_health_records and not record.veterinarian %}
-                            <form method="post" action="{% url 'choose_health_record' record.id %}" style="display:inline;">
+                            <form method="post" action="{% url 'choose_health_record' animal.id record.id %}" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-primary btn-sm me-2">Choose</button>
                             </form>
                             {% endif %}
-                            {% if user|can_create_health_records %}
-                            <a href="{% url 'health_records_caregiver_edit' record.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
-                            {% elif user|can_manage_health_records and record.veterinarian == user %}
-                            <a href="{% url 'health_records_vet_edit' record.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
+                            {% if user|can_create_health_records and record.status == record.Status.REQUESTED and user.id == record.caregiver.id%}
+                            <a href="{% url 'health_records_caregiver_edit' animal.id record.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
+                            {% elif user|can_manage_health_records and record.veterinarian == user and user.id == record.veterinarian.id %}
+                            <a href="{% url 'health_records_vet_edit' animal.id record.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
                             {% endif %}
                             <form method="post" class="d-inline">
                                 {% csrf_token %}
-                                <button type="submit" formaction="{% url 'health_records_delete' record.id %}" class="btn btn-danger btn-sm">Delete</button>
+                                <button type="submit" formaction="{% url 'health_records_delete' animal.id record.id %}" class="btn btn-danger btn-sm">Delete</button>
                             </form>
                         </div>
                     </li>

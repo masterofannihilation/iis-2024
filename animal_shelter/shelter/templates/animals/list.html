@@ -51,11 +51,10 @@
                         {% if user|is_volunteer %}
                             <a href="{% url 'walks_list' id=animal.id %}" class="btn btn-info btn-sm me-2">Schedule a walk</a>
                         {% elif user|is_vet %}
-                            <a href="#" class="btn btn-info btn-sm me-2">Health records</a>
+                            <a href="{% url 'health_records_detail' id=animal.id %}" class="btn btn-info btn-sm me-2">Health records</a>
                         {% elif user|can_manage_animals %}
                             <a href="{% url 'walks_list' id=animal.id %}" class="btn btn-info btn-sm me-2">Walk schedule</a>
-                            <a href="{% url 'health_records_detail' id=animal.id %}" class="btn btn-info btn-sm me-2">Vet requests</a>
-                            {% comment %} <a href="#" class="btn btn-info btn-sm me-2">Vet requests</a> {% endcomment %}
+                            <a href="{% url 'health_records_detail' id=animal.id %}" class="btn btn-info btn-sm me-2">Health records</a>
                             <a href="{% url 'animal_edit' animal.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
                             <button type="submit" formaction="{% url 'animal_delete' animal.id %}" class="btn btn-danger btn-sm">
                                 Delete

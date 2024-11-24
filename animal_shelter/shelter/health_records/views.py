@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.forms import ModelForm, DateTimeInput, forms
+from django.forms import ModelForm, DateTimeInput, ModelChoiceField, Select, forms
 from functools import wraps
 from ..models import VeterinarianRequest, Animal, User
 from django.contrib.auth.decorators import login_required
@@ -8,9 +8,19 @@ from django.db.models import Case, When, IntegerField
 from django.utils import timezone
 
 class HealthRecordCaregiverForm(ModelForm):
+    veterinarian = ModelChoiceField(
+        queryset=User.objects.filter(role=User.Role.VETERINARIAN),
+        required=False,
+        widget=Select,
+        label="Veterinarian",
+    )
     class Meta:
         model = VeterinarianRequest
-        fields = ["animal", "veterinarian", "status", "description"]
+        fields = ["veterinarian", "description"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['veterinarian'].label_from_instance = lambda obj: f"{obj.first_name} {obj.last_name} ({obj.username})"
 
 class HealthRecordVetForm(ModelForm):
     class Meta:
@@ -25,7 +35,7 @@ class HealthRecordVetForm(ModelForm):
         if examination_date and examination_date < timezone.now():
             raise forms.ValidationError("Examination date must be either today or in the future.")
         return examination_date
-    
+
 def user_can_create_request(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
@@ -43,57 +53,55 @@ def user_can_manage_request(view_func):
     return wrapper
 
 @login_required
-def health_records_list(request):
-    animals = Animal.objects.all()
-    species_list = Animal.AnimalType.choices
-    return render(
-        request, 
-        "health_records/list.html", 
-        {
-            "animals": animals,
-            "species_list": [species[0] for species in species_list]
-        }
-    )
-
-@login_required
 @user_can_create_request
-def health_records_create(request):
+def health_records_create(request, animal_id):
+    animal = get_object_or_404(Animal, id=animal_id)
     if request.method == "POST":
         form = HealthRecordCaregiverForm(request.POST)
         if form.is_valid():
             health_record = form.save(commit=False)
+            health_record.status = VeterinarianRequest.Status.REQUESTED
+            health_record.request_date = timezone.now()
             health_record.caregiver = request.user
+            health_record.animal = animal
             health_record.save()
-            return redirect("health_records_detail", id=health_record.animal.id)
+            return redirect("health_records_detail", id=animal.id)
     else:
         form = HealthRecordCaregiverForm()
-    return render(request, "health_records/create.html", {"form": form})
+    return render(request, "health_records/create.html", {"form": form, "animal": animal})
 
 @login_required
-@user_can_manage_request
-def health_records_caregiver_edit(request, id):
-    health_record = get_object_or_404(VeterinarianRequest, id=id)
+@user_can_create_request
+def health_records_caregiver_edit(request, animal_id, id):
+    health_record = get_object_or_404(VeterinarianRequest, id=id, animal_id=animal_id)
+    # Check if the status is REQUESTED
+    if health_record.status != VeterinarianRequest.Status.REQUESTED or health_record.caregiver != request.user:
+        return HttpResponseForbidden("Access Denied: Only requests with status 'REQUESTED' can be edited by caregivers.")
     if request.method == "POST":
         form = HealthRecordCaregiverForm(request.POST, instance=health_record)
         if form.is_valid():
             form.save()
-            return redirect("health_records_detail", id=health_record.animal.id)
+            return redirect("health_records_detail", id=animal_id)
     else:
         form = HealthRecordCaregiverForm(instance=health_record)
-    return render(request, "health_records/edit.html", {"form": form})
+    return render(request, "health_records/edit.html", {"form": form, "animal_id": animal_id})
 
 @login_required
 @user_can_manage_request
-def health_records_vet_edit(request, id):
-    health_record = get_object_or_404(VeterinarianRequest, id=id)
+def health_records_vet_edit(request, animal_id, id):
+    health_record = get_object_or_404(VeterinarianRequest, id=id, animal_id=animal_id)
     if request.method == "POST":
         form = HealthRecordVetForm(request.POST, instance=health_record)
-        if form.is_valid():
-            form.save()
-            return redirect("health_records_detail", id=health_record.animal.id)
+        if form.is_valid() and health_record.examination_date is not None:
+            health_record.save()
+            return redirect("health_records_detail", id=animal_id)
+        else:
+            # If form is invalid keep old data
+            form = HealthRecordVetForm(instance=health_record)
+            return redirect("health_records_detail", id=animal_id)
     else:
         form = HealthRecordVetForm(instance=health_record)
-    return render(request, "health_records/edit_vet.html", {"form": form})
+    return render(request, "health_records/edit_vet.html", {"form": form, "animal_id": animal_id})
 
 @login_required
 def health_records_detail(request, id):
@@ -111,24 +119,23 @@ def health_records_detail(request, id):
 
 @login_required
 @user_can_manage_request
-def health_records_delete(request, id):
-    record = get_object_or_404(VeterinarianRequest, id=id)
+def health_records_delete(request, animal_id, id):
+    record = get_object_or_404(VeterinarianRequest, id=id, animal_id=animal_id)
     if request.method == "POST":
         record.delete()
-        return redirect("health_records_detail", id=record.animal.id)
-    return render(request, "health_records/delete.html", {"health_record": record})
+        return redirect("health_records_detail", id=animal_id)
+    return render(request, "health_records/delete.html", {"health_record": record, "animal_id": animal_id})
 
 @login_required
-def choose_health_record(request, id):
-    health_record = get_object_or_404(VeterinarianRequest, pk=id, veterinarian__isnull=True)
+def choose_health_record(request, animal_id, id):
+    health_record = get_object_or_404(VeterinarianRequest, pk=id, veterinarian__isnull=True, animal_id=animal_id)
     if request.user.role != User.Role.VETERINARIAN:
         return HttpResponseForbidden("Access Denied: Only veterinarians can choose a health record.")
     
     if request.method == 'POST':
         if health_record.veterinarian is None:
             health_record.veterinarian = request.user
-            # health_record.status = VeterinarianRequest.Status.SCHEDULED
             health_record.save()
-        return redirect('health_records_detail', id=health_record.animal.id)
+        return redirect('health_records_detail', id=animal_id)
     
-    return redirect('health_records_detail', id=health_record.animal.id)
+    return redirect('health_records_detail', id=animal_id)
