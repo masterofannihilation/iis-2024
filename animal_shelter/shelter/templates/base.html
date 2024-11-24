@@ -45,6 +45,9 @@
                 <a class="nav-link {% if request.resolver_match.url_name == 'users_list' %}active{% endif %}" href="{% url 'users_list' %}">Users</a>
             </li>
             {% endif %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">About</a>
+            </li>
         </ul>
 
         <div class="ms-auto d-inline-flex align-items-center">

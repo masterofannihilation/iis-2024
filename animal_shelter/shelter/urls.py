@@ -42,4 +42,6 @@ urlpatterns = [
     path("health_records/<int:id>/edit_vet/", health_records_views.health_records_vet_edit, name="health_records_vet_edit"),
     path("health_records/<int:id>/delete/", health_records_views.health_records_delete, name="health_records_delete"),
     path("health_records/<int:id>/choose/", health_records_views.choose_health_record, name="choose_health_record"),
+
+    path("about/", views.about_page, name="about")
 ]
