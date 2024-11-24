@@ -43,4 +43,6 @@ urlpatterns = [
     path("walks/<int:walk_id>/edit/", walk_views.walk_edit, name="walk_edit"),
     path("walks/<int:walk_id>/delete/", walk_views.walk_delete, name="walk_delete"),
     path("walks/history/", walk_views.walk_history, name="walk_history"),
+    
+    path("about/", views.about_page, name="about")
 ]
