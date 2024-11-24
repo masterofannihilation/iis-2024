@@ -40,10 +40,11 @@
   max-width: calc(100% - 180px);
 }
 
-.animal-details h3 {
+.animal-details h3, .walk-details h3 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: bold;
+  line-height: 1.2; /* Added to match inline style */
 }
 
 .animal-details .description {

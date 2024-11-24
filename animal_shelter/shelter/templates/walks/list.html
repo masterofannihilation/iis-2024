@@ -66,8 +66,8 @@
                         </div>
 
                         <!-- Details -->
-                        <div class="walk-details ms-4">
-                            <h3 class="text-dark mb-2" style="line-height: 1.2;">{{ walk.animal.name }}</h3>
+                        <div class="animal-details ms-4">
+                            <h3 class="text-dark mb-2">{{ walk.animal.name }}</h3>
                             {% if walk.volunteer %}
                                 <p class="text-muted mt-1 mb-0">Volunteer: {{ walk.volunteer.first_name }} {{ walk.volunteer.last_name }} ({{ walk.volunteer.username }})</p>
                             {% else %}
