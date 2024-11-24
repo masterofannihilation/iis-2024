@@ -25,3 +25,10 @@ def seed_demo_data():
     for data in seeds:
         for entry in data:
             entry.save()
+
+    from .health_records import HEALTH_RECORD_SEEDS
+
+    seeds = (HEALTH_RECORD_SEEDS,)
+    for data in seeds:
+        for entry in data:
+            entry.save()

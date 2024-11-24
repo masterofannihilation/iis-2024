@@ -3,6 +3,7 @@ from . import views
 from .users import views as user_views
 from .animals import views as animal_views
 from .walks import views as walk_views
+from .health_records import views as health_records_views
 from django.contrib.auth.views import LoginView, LogoutView
 
 urlpatterns = [
@@ -26,10 +27,19 @@ urlpatterns = [
     path("animals/<int:id>/edit/", animal_views.animal_edit, name="animal_edit"),
     path("animals/<int:id>/delete/", animal_views.animal_delete, name="animal_delete"),
     path("animals/<int:id>/walks/", walk_views.walks_list, name="walks_list"),
+    path("animals/<int:id>/heatlh_records/", health_records_views.health_records_detail, name="health_records_detail"),
     path("walks/", walk_views.walks_list, name="walks_list"),
     path("walks/create/", walk_views.walk_create, name="walk_create"),
     path("walks/<int:walk_id>/", walk_views.walk_detail, name="walk_detail"),
     path("walks/<int:walk_id>/edit/", walk_views.walk_edit, name="walk_edit"),
     path("walks/<int:walk_id>/delete/", walk_views.walk_delete, name="walk_delete"),
     path("walks/history/", walk_views.walk_history, name="walk_history"),
+    
+    path("health_records/", health_records_views.health_records_list, name="health_records_list"),
+    path("health_records/create/", health_records_views.health_records_create, name="health_records_create"),
+    path("health_records/<int:id>/", health_records_views.health_records_detail, name="health_records_detail"),
+    path("health_records/<int:id>/edit_caregiver/", health_records_views.health_records_caregiver_edit, name="health_records_caregiver_edit"),
+    path("health_records/<int:id>/edit_vet/", health_records_views.health_records_vet_edit, name="health_records_vet_edit"),
+    path("health_records/<int:id>/delete/", health_records_views.health_records_delete, name="health_records_delete"),
+    path("health_records/<int:id>/choose/", health_records_views.choose_health_record, name="choose_health_record"),
 ]
