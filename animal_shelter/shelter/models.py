@@ -140,7 +140,7 @@ class VeterinarianRequest(models.Model):
         blank=True,
         related_name="vet_requests",
     )
-    request_date = models.DateField(auto_now_add=True)
+    request_date = models.DateField()
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.REQUESTED
     )
