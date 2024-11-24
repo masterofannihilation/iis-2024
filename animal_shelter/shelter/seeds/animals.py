@@ -8,7 +8,7 @@ ANIMAL_SEEDS = (
         species=Animal.AnimalType.DOG,
         date_of_birth=datetime.date(2019, 1, 1),
         description="Former police dog.",
-        intake_date=datetime.date(2023, 11, 1),
+        intake_date=datetime.date(2022, 11, 1),
         image_url="",
     ),
     Animal(
@@ -44,7 +44,7 @@ ANIMAL_SEEDS = (
         species=Animal.AnimalType.CAT,
         date_of_birth=datetime.date(2021, 11, 5),
         description="Shy but affectionate Persian cat.",
-        intake_date=datetime.date(2023, 7, 5),
+        intake_date=datetime.date(2022, 7, 5),
         image_url="https://pangovet.com/wp-content/uploads/2024/06/persian-cat-in-grass_Cattrall-shutterstock-e1666280664132.jpg",
     ),
     Animal(
@@ -71,7 +71,7 @@ ANIMAL_SEEDS = (
         species=Animal.AnimalType.DOG,
         date_of_birth=datetime.date(2020, 2, 14),
         description="Energetic Jack Russell Terrier mix.",
-        intake_date=datetime.date(2023, 4, 10),
+        intake_date=datetime.date(2022, 4, 10),
         image_url="https://www.ocregister.com/wp-content/uploads/migration/l7m/l7ml47-b78680484z.120100823145827000gc2pvj87.1.jpg?w=535",
     ),
     Animal(
@@ -82,5 +82,14 @@ ANIMAL_SEEDS = (
         description="Gentle rabbit with light brown fur.",
         intake_date=datetime.date(2023, 3, 5),
         image_url="https://bosworthbunnies.weebly.com/uploads/1/1/8/1/118146189/img-0179_orig.jpeg",
+    ),
+    Animal(
+        id=1_002_009,
+        name="Ryan Gosling",
+        species=Animal.AnimalType.RABBIT,
+        date_of_birth=datetime.date(2023, 8, 22),
+        description="Literally me.",
+        intake_date=datetime.date(2024, 3, 5),
+        image_url="https://media.tenor.com/YkRvXolfP-wAAAAM/libee-youu-yess.gif",
     ),
 )
