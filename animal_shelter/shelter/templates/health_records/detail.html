@@ -63,7 +63,12 @@
                             {% endif %}
                             <form method="post" class="d-inline">
                                 {% csrf_token %}
+                                {% if user|can_create_health_records and record.status == record.Status.REQUESTED and user.id == record.caregiver.id%}
                                 <button type="submit" formaction="{% url 'health_records_delete' animal.id record.id %}" class="btn btn-danger btn-sm">Delete</button>
+                                {% elif user|can_manage_health_records and record.veterinarian == user and user.id == record.veterinarian.id %}
+                                <button type="submit" formaction="{% url 'health_records_delete' animal.id record.id %}" class="btn btn-danger btn-sm">Delete</button>
+                                {% endif %}
+
                             </form>
                         </div>
                     </li>

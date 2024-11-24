@@ -37,6 +37,7 @@ urlpatterns = [
     path("animals/<int:animal_id>/health_records/<int:id>/choose/", health_records_views.choose_health_record, name="choose_health_record"),
 
     path("walks/", walk_views.walks_list, name="walks_list"),
+    path('walks/create/<int:animal_id>/', walk_views.walk_create, name='walk_create'),
     path("walks/create/", walk_views.walk_create, name="walk_create"),
     path("walks/<int:walk_id>/", walk_views.walk_detail, name="walk_detail"),
     path("walks/<int:walk_id>/edit/", walk_views.walk_edit, name="walk_edit"),
