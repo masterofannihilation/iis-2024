@@ -8,16 +8,27 @@ from collections import defaultdict
 from ..models import Walk, Animal, User
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
+from django.forms.widgets import DateTimeInput
+from django import forms
 
 class WalkForm(ModelForm):
     class Meta:
         model = Walk
         fields = ['animal', 'volunteer', 'caregiver', 'begin_time', 'end_time', 'status']
         widgets = {
-            'begin_time': DateTimeInput(attrs={'type': 'datetime-local'}),
-            'end_time': DateTimeInput(attrs={'type': 'datetime-local'}),
+            'begin_time': DateTimeInput(attrs={'type': 'datetime-local', 'format': '%d.%m.%Y %H:%M'}),
+            'end_time': DateTimeInput(attrs={'type': 'datetime-local', 'format': '%d.%m.%Y %H:%M'}),
         }
-    
+
+    begin_time = forms.DateTimeField(
+        input_formats=['%d.%m.%Y %H:%M'],
+        widget=forms.DateTimeInput(attrs={'type': 'text', 'placeholder': 'dd.mm.YYYY HH:MM'})
+    )
+    end_time = forms.DateTimeField(
+        input_formats=['%d.%m.%Y %H:%M'],
+        widget=forms.DateTimeInput(attrs={'type': 'text', 'placeholder': 'dd.mm.YYYY HH:MM'})
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not self.instance.pk:
@@ -42,7 +53,7 @@ class WalkForm(ModelForm):
                 begin_time__lt=end_time,
                 end_time__gt=begin_time
             ).exclude(id=self.instance.id)
-            
+
             if overlapping_walks.exists():
                 raise ValidationError(_("This walk overlaps with another walk for the same animal."))
 
@@ -76,7 +87,7 @@ def walks_list(request, id=None):
                 return HttpResponseForbidden("Access Denied: Only caregivers can approve a walk.")
 
         return redirect('walks_list')
-    
+
     # Filter walks to include only upcoming walks
     walks = Walk.objects.filter(begin_time__gte=timezone.now())
 
@@ -154,7 +165,13 @@ def walk_edit(request, walk_id):
             form.save()
             return redirect('walks_list')
     else:
-        form = WalkForm(instance=walk)
+        # Format the initial values for display
+        initial_data = {
+            'begin_time': walk.begin_time.strftime('%d.%m.%Y %H:%M') if walk.begin_time else '',
+            'end_time': walk.end_time.strftime('%d.%m.%Y %H:%M') if walk.end_time else '',
+        }
+        form = WalkForm(instance=walk, initial=initial_data)
+
     return render(request, 'walks/edit.html', {'form': form})
 
 @login_required
@@ -171,19 +188,19 @@ def choose_walk(request, walk_id):
     walk = get_object_or_404(Walk, pk=walk_id, status=Walk.Status.AVAILABLE)
     if request.user.role != User.Role.VOLUNTEER:
         return HttpResponseForbidden("Access Denied: Only volunteers can choose a walk.")
-    
+
     if request.method == 'POST':
         walk.volunteer = request.user
         walk.status = Walk.Status.RESERVED
         walk.save()
         return redirect('walks_list')
-    
+
     return render(request, 'walks/choose.html', {'walk': walk})
 
 @login_required
 def walk_history(request):
     if request.user.role != User.Role.VOLUNTEER:
         return HttpResponseForbidden("Access Denied: Only volunteers can view their walk history.")
-    
+
     walks = Walk.objects.filter(volunteer=request.user).order_by('-begin_time')
     return render(request, 'walks/history.html', {'walks': walks})
