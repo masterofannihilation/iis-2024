@@ -44,11 +44,6 @@
             <a href="{% url 'walk_history' %}" class="btn btn-info">My Walk History</a>
         </div>
         {% endif %}
-        {% if user.is_authenticated and user.role == 'Caregiver' %}
-        <div class="col-auto align-self-end">
-            <a href="{% url 'walk_create' %}" class="btn btn-success">Create Walk</a>
-        </div>
-        {% endif %}
     </form>
 
     <div class="walk-list">
@@ -97,11 +92,15 @@
                                     {% if user.role == 'Caregiver' and walk.can_be_approved_by_caregiver %}
 					                    <input type="hidden" name="walk_id" value="{{ walk.id }}">
                                 	    <input type="hidden" name="action" value="approve">
+                                        {% if walk.caregiver.id == user.id %}
                                         <button type="submit" class="btn btn-success btn-sm" formaction = "{% url 'walks_list' %}">Approve</button>
+                                        {% endif %}
                                     {% endif %}
                                     {% if user|can_manage_walks %}
+                                        {% if walk.caregiver.id == user.id %}
                                         <a href="{% url 'walk_edit' walk.id %}" class="btn btn-warning btn-sm">Edit</a>
                                         <button type="submit" class="btn btn-danger btn-sm" formaction="{% url 'walk_delete' walk.id %}">Delete</button>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                             </form>

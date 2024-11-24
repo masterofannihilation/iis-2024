@@ -28,14 +28,15 @@
         {% if user.is_authenticated %}
         <div class="walk-actions-detail d-flex align-items-start">
             <form class="d-flex align-items-center" method="post">
+                <a href="{% url 'walks_list' id=walk.animal.id %}" class="btn btn-info btn-lg me-2">Walk Schedule</a><br>
                 {% csrf_token %}
                 {% if user|can_manage_walks %}
+                <a href="{% url 'walk_create' walk.animal.id %}" class="btn btn-success btn-lg me-2">Create a walk</a>
                     <a href="{% url 'walk_edit' walk.id %}" class="btn btn-warning btn-lg me-2">Edit</a>
                     <button type="submit" formaction="{% url 'walk_delete' walk.id %}" class="btn btn-danger btn-lg me-2">
                         Delete
                     </button>
                 {% endif %}
-                <a href="{% url 'walks_list' id=walk.animal.id %}" class="btn btn-info btn-lg me-2">Walk Schedule</a>
             </form>
         </div>
         {% endif %}

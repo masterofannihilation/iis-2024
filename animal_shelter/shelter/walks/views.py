@@ -14,7 +14,7 @@ from django import forms
 class WalkForm(ModelForm):
     class Meta:
         model = Walk
-        fields = ['animal', 'volunteer', 'caregiver', 'begin_time', 'end_time', 'status']
+        fields = ['volunteer', 'begin_time', 'end_time', 'status']
         widgets = {
             'begin_time': DateTimeInput(attrs={'type': 'datetime-local', 'format': '%d.%m.%Y %H:%M'}),
             'end_time': DateTimeInput(attrs={'type': 'datetime-local', 'format': '%d.%m.%Y %H:%M'}),
@@ -80,14 +80,14 @@ def walks_list(request, id=None):
             else:
                 return HttpResponseForbidden("Access Denied: Only volunteers can choose a walk.")
         elif action == 'approve':
-            if request.user.role == User.Role.CAREGIVER and walk.can_be_approved_by_caregiver():
+            if request.user.role == User.Role.CAREGIVER and walk.can_be_approved_by_caregiver() and walk.caregiver == request.user :
                 walk.status = Walk.Status.APPROVED
                 walk.save()
             else:
                 return HttpResponseForbidden("Access Denied: Only caregivers can approve a walk.")
 
         return redirect('walks_list')
-
+    
     # Filter walks to include only upcoming walks
     walks = Walk.objects.filter(begin_time__gte=timezone.now())
 
@@ -140,15 +140,19 @@ def walks_list(request, id=None):
 
 @login_required
 @user_can_manage_walks
-def walk_create(request):
+def walk_create(request, animal_id):
+    animal = get_object_or_404(Animal, id=animal_id)
     if request.method == 'POST':
         form = WalkForm(request.POST)
         if form.is_valid():
-            form.save()
+            walk = form.save(commit=False)
+            walk.caregiver = request.user
+            walk.animal = animal
+            walk.save()
             return redirect('walks_list')
     else:
-        form = WalkForm()
-    return render(request, 'walks/create.html', {'form': form})
+        form = WalkForm(initial={'animal': animal})
+    return render(request, 'walks/create.html', {'form': form, 'animal': animal})
 
 @login_required
 def walk_detail(request, walk_id):
@@ -159,6 +163,10 @@ def walk_detail(request, walk_id):
 @user_can_manage_walks
 def walk_edit(request, walk_id):
     walk = get_object_or_404(Walk, pk=walk_id)
+    # Check if the logged-in user is the caregiver who created the walk
+    if walk.caregiver != request.user:
+        return HttpResponseForbidden("Access Denied: Only the caregiver who created this walk can edit it.")
+
     if request.method == 'POST':
         form = WalkForm(request.POST, instance=walk)
         if form.is_valid():
@@ -178,6 +186,10 @@ def walk_edit(request, walk_id):
 @user_can_manage_walks
 def walk_delete(request, walk_id):
     walk = get_object_or_404(Walk, pk=walk_id)
+    # Check if the logged-in user is the caregiver who created the walk
+    if walk.caregiver != request.user:
+        return HttpResponseForbidden("Access Denied: Only the caregiver who created this walk can delete it.")
+
     if request.method == 'POST':
         walk.delete()
         return redirect('walks_list')
@@ -188,19 +200,19 @@ def choose_walk(request, walk_id):
     walk = get_object_or_404(Walk, pk=walk_id, status=Walk.Status.AVAILABLE)
     if request.user.role != User.Role.VOLUNTEER:
         return HttpResponseForbidden("Access Denied: Only volunteers can choose a walk.")
-
+    
     if request.method == 'POST':
         walk.volunteer = request.user
         walk.status = Walk.Status.RESERVED
         walk.save()
         return redirect('walks_list')
-
+    
     return render(request, 'walks/choose.html', {'walk': walk})
 
 @login_required
 def walk_history(request):
     if request.user.role != User.Role.VOLUNTEER:
         return HttpResponseForbidden("Access Denied: Only volunteers can view their walk history.")
-
+    
     walks = Walk.objects.filter(volunteer=request.user).order_by('-begin_time')
     return render(request, 'walks/history.html', {'walks': walks})
