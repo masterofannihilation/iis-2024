@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load permissions %}
+{% load static %}
 
 {% block title %}Walking Schedule{% endblock %}
 
@@ -54,21 +55,23 @@
         {% for date, walks in walks_grouped %}
             <h2 class="mt-4">{{ date }}</h2>
             {% for walk in walks %}
-                <div class="walk-item d-flex align-items-center mb-4 p-3 border rounded">
-                    <a href="{% url 'walk_detail' walk.id %}" class="d-flex flex-grow-1 align-items-center text-decoration-none">
-                        {% if walk.animal.image_url %}
-                            <img src="{{ walk.animal.image_url }}" alt="{{ walk.animal.name }}" class="animal-image me-3" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10px;">
-                        {% else %}
-                            <div class="animal-placeholder me-3" style="width: 100px; height: 100px; background-color: #ddd; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
-                                <span>No Image</span>
-                            </div>
-                        {% endif %}
+                <div class="walk-item d-flex position-relative mb-4 p-3 border rounded" style="background-color: #f9f9f9;">
+                    <!-- Clickable area -->
+                    <a href="{% url 'walk_detail' walk.id %}" class="walk-item-link d-flex flex-grow-1 text-decoration-none">
+                        <!-- Image -->
+                        <div class="animal-image-container">
+                            <img src="{% if walk.animal.image_url %}{{ walk.animal.image_url }}{% else %}{% static 'images/default_animal.png' %}{% endif %}"
+                                 alt="{{ walk.animal.name }}"
+                                 class="animal-image">
+                        </div>
+
+                        <!-- Details -->
                         <div class="walk-details ms-4">
-                            <h3 class="text-dark mb-0" style="line-height: 1.2;">{{ walk.animal.name }}</h3>
-                            {% if walk.volunteer != none %}
+                            <h3 class="text-dark mb-2" style="line-height: 1.2;">{{ walk.animal.name }}</h3>
+                            {% if walk.volunteer %}
                                 <p class="text-muted mt-1 mb-0">Volunteer: {{ walk.volunteer.first_name }} {{ walk.volunteer.last_name }} ({{ walk.volunteer.username }})</p>
                             {% else %}
-                                <p class="text-muted mt-1 mb-0">Volunteer: </p>
+                                <p class="text-muted mt-1 mb-0">Volunteer: None</p>
                             {% endif %}
                             <p class="text-muted mt-1 mb-0">Caregiver: {{ walk.caregiver.first_name }} {{ walk.caregiver.last_name }} ({{ walk.caregiver.username }})</p>
                             <p class="text-muted mt-1 mb-0">Begin Time: {{ walk.begin_time }}</p>
@@ -76,36 +79,38 @@
                             <p class="text-muted mt-1 mb-0">Status: {{ walk.get_status_display }}</p>
                         </div>
                     </a>
+
+                    <!-- Actions -->
                     {% if user.is_authenticated %}
-                    <div class="walk-actions ms-3">
-                        {% if user.role == 'Volunteer' and walk.can_be_chosen_by_volunteer %}
-                            <form method="post" action="{% url 'walks_list' %}" style="display:inline;">
+                        <div class="animal-actions ms-3 d-flex align-items-end">
+                            <form class="d-flex align-items-center" method="post" action="{% url 'walks_list' %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="walk_id" value="{{ walk.id }}">
-                                <input type="hidden" name="action" value="choose">
-                                <button type="submit" class="btn btn-primary btn-sm">Choose</button>
+                                <input type="hidden" name="action" value="">
+
+                                <div class="walk-actions ms-3">
+                                    {% if user.role == 'Volunteer' and walk.can_be_chosen_by_volunteer %}
+					                    <input type="hidden" name="walk_id" value="{{ walk.id }}">
+                                	    <input type="hidden" name="action" value="choose">
+                                        <button type="submit" class="btn btn-primary btn-sm" formaction="{% url 'walks_list' %}">Choose</button>
+                                    {% endif %}
+                                    {% if user.role == 'Caregiver' and walk.can_be_approved_by_caregiver %}
+					                    <input type="hidden" name="walk_id" value="{{ walk.id }}">
+                                	    <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="btn btn-success btn-sm" formaction = "{% url 'walks_list' %}">Approve</button>
+                                    {% endif %}
+                                    {% if user|can_manage_walks %}
+                                        <a href="{% url 'walk_edit' walk.id %}" class="btn btn-warning btn-sm">Edit</a>
+                                        <button type="submit" class="btn btn-danger btn-sm" formaction="{% url 'walk_delete' walk.id %}">Delete</button>
+                                    {% endif %}
+                                </div>
                             </form>
-                        {% endif %}
-                        {% if user.role == 'Caregiver' and walk.can_be_approved_by_caregiver %}
-                            <form method="post" action="{% url 'walks_list' %}" style="display:inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="walk_id" value="{{ walk.id }}">
-                                <input type="hidden" name="action" value="approve">
-                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                            </form>
-                        {% endif %}
-                        {% if user|can_manage_walks %}
-                            <a href="{% url 'walk_edit' walk.id %}" class="btn btn-warning btn-sm">Edit</a>
-                            <form method="post" action="{% url 'walk_delete' walk.id %}" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-                        {% endif %}
-                    </div>
-                {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
             {% endfor %}
         {% endfor %}
     </div>
+
 </div>
 {% endblock %}
