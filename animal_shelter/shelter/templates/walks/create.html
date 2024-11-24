@@ -1,10 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Create a Walk{% endblock %}
 {% block content %}
 {% load static %}
 
 <div class="container mt-4">
-    <h1 class="mb-4">Create a New Walk</h1>
+    <h1 class="mb-4">Create a New Walk for {{ animal.name }}</h1>
 
     <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
