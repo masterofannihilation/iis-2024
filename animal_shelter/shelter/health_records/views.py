@@ -71,7 +71,7 @@ def health_records_create(request, animal_id):
     return render(request, "health_records/create.html", {"form": form, "animal": animal})
 
 @login_required
-@user_can_manage_request
+@user_can_create_request
 def health_records_caregiver_edit(request, animal_id, id):
     health_record = get_object_or_404(VeterinarianRequest, id=id, animal_id=animal_id)
     # Check if the status is REQUESTED
