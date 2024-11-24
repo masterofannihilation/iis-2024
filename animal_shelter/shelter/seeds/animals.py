@@ -86,7 +86,7 @@ ANIMAL_SEEDS = (
     Animal(
         id=1_002_009,
         name="Ryan Gosling",
-        species=Animal.AnimalType.RABBIT,
+        species=Animal.AnimalType.CAT,
         date_of_birth=datetime.date(2023, 8, 22),
         description="Literally me.",
         intake_date=datetime.date(2024, 3, 5),

@@ -67,6 +67,8 @@ def animals_list(request):
     if species_filter:
         animals = animals.filter(species=species_filter)
 
+    animals = animals.order_by("name")
+
     return render(
         request, "animals/list.html", {"animals": animals, "species_list": species_list}
     )
