@@ -130,7 +130,7 @@
         definované zadáním (např. registrace uživatele, správa uživatelů a činnosti jednotlivých rolí). Video nahrajte
         například na VUT Google Drive, kde ho bude možné přímo spustit z odkazu.</p>
 
-        <h2>Implementace</h2>
+    <h2>Implementace</h2>
         <p>
             Na implementáciu informačného systému bol použitý Python framework Django. Dáta sa ukladajú v databáze PostgreSQL. Hlavné funkcionality sú rozdelené do modulov podľa oblastí použitia:
             <strong>users</strong>, <strong>animals</strong>, <strong>walks</strong> a <strong>health-records</strong>.
@@ -152,12 +152,13 @@
             <li><strong>Správa používateľov:</strong>
                 <ul>
                     <li><strong>Modul:</strong> <code>users</code></li>
-                    <li><strong>Súbor:</strong> <code>views.py</code></li>
+                    <li><strong>Súbory:</strong> <code>views.py, actions.py, list.py</code></li>
                     <li><strong>Hlavné funkcie:</strong>
                         <ul>
                             <li><code>users_list</code> – zobrazenie zoznamu používateľov s možnosťou filtrovania.</li>
                             <li><code>user_edit</code> – úprava údajov používateľa.</li>
                             <li><code>user_create</code> – pridanie nového používateľa.</li>
+                            <li><code>delete</code> – odstránenie používateľa.</li>
                             <li><code>reset_password</code> – obnova hesla používateľa.</li>
                         </ul>
                     </li>
@@ -170,17 +171,21 @@
         <ul>
             <li><strong>Správa zvierat:</strong>
                 <ul>
-                    <li><strong>Modul:</strong> <code>animals</code></li>
-                    <li><strong>Súbor:</strong> <code>views.py</code></li>
+                    <li><strong>Moduly:</strong> <code>animals, health-records, walks</code></li>
+                    <li><strong>Súbory:</strong> <code>views.py</code></li>
                     <li><strong>Hlavné funkcie:</strong>
                         <ul>
                             <li><code>animals_list</code> – zobrazenie zoznamu zvierat.</li>
                             <li><code>animal_create</code> – pridanie nového zvieraťa.</li>
                             <li><code>animal_edit</code> – úprava údajov o zvierati.</li>
                             <li><code>animal_delete</code> – odstránenie zvieraťa.</li>
+                            <li><code>health_records_create</code> – vytvorenie nového zdravotného záznamu pre zviera.</li>
+                            <li><code>health_records_caregiver_edit</code> – úprava zdravotného záznamu zo strany opatrovateľa - detaily o predchádzajúcich zdravotných požiadavkách zvieraťa.</li>
+                            <li><code>walk_create</code> – vytvorenie nového termínu venčenia.</li>
+                            <li><code>walk_edit</code> – úprava údajov venčenia.</li>
                         </ul>
                     </li>
-                    <li><strong>Šablóny:</strong> <code>templates/animals/*</code></li>
+                    <li><strong>Šablóny:</strong> <code>templates/animals/*, templates/health-records/*, templates/walks/*</code></li>
                 </ul>
             </li>
         </ul>
@@ -191,15 +196,12 @@
                 <ul>
                     <li><strong>Modul:</strong> <code>health-records</code></li>
                     <li><strong>Súbor:</strong> <code>views.py</code></li>
-                    <li><strong>Hlavné funkcie:</strong>
-                        <ul>
-
-                        </ul>
+                    <li><strong>Hlavné funkcie:</strong> <ul>
+                        <li><code>health_records_vet_edit</code> – úprava zdravotného záznamu zo strany veterinára - stav a výsledok vyšetrenia.</li>
+                        <li><code>health_records_delete</code> – odstránenie zdravotného záznamu.</li>
+                        <li><code>choose_health_record</code> – výber požiadavky na vyšetrenie ktorá nemá priradeného veterinára </li> </ul>
                     </li>
-                    <li><strong>Šablóny:</strong> <code>templates/health-records/*</code></li>
-                </ul>
-            </li>
-        </ul>
+                    <li><strong>Šablóny:</strong> <code>templates/health-records/*</code></li> </ul> </li> </ul>
 
         <h4>4. Dobrovoľník</h4>
         <ul>
@@ -209,6 +211,7 @@
                     <li><strong>Súbor:</strong> <code>views.py</code></li>
                     <li><strong>Hlavné funkcie:</strong>
                         <ul>
+                            <li><code>walks_list</code> – zobrazenie zoznamu venčení.</li>
                             <li><code>choose_walk</code> – výber dostupného venčenia.</li>
                             <li><code>walk_history</code> – zobrazenie histórie venčení dobrovoľníka.</li>
                         </ul>
@@ -245,7 +248,7 @@
 
     <h3>Databáze</h3>
 
-    <img src="ER_shelter.png" alt="Relační schéma databáze systému Shelter" style="max-width:100%; height:auto;">
+    <img src="ER_shelter.png" style="width:60%; ">
 
     <h2>Instalace</h2>
 
