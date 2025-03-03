@@ -1,19 +1,60 @@
-# Projekt IIS 2024/25 (tím xkruli03)
+# Animal Shelter Information System
 
-Riešenie projektu z kurzu Informační systémy ([IIS](https://www.fit.vut.cz/study/course/IIS/.cs)) varianty *Zvířecí útulek*.
+Django-based web application designed to manage an animal shelter, including details about animals, their health records, and walking schedules. It supports roles such as administrators, caregivers, veterinarians, and volunteers, each with specific functionality.
 
-Členovia tímu:
-- Michal Krulich [xkruli03] (vedúci)
-- Stanislav Letaši [xletas00]
-- Boris Hatala [xhatal02]
+![Cute animal](overview.gif)
 
-Projekt je dostupný na free hostingu od Render.com na adrese [https://iis-2024.onrender.com/](https://iis-2024.onrender.com/).
 
-Obsah tohoto archívu/repozitára:
-- `docs.html` - povinná dokumentácia k projektu
-- `animal_shelter` - implementácia informačného systému pomocou frameworku Django (podrobnejší popis v `doc.html`)
-- `how_to_run.md` - návod pre nastavenie vývojového prostredia a spustenie lokálneho servera pre vývoj
-- `url_structure` - prvotný nárvh rozloženia stránok (skutočná implementácia sa môže líšiť)
-- `use_cases.md` - tímový rozbor a upresnenie požiadavkov na výsledný informačný systém
-- `Dockerfile` - Docker image s PostgreSQL databázovým systémom určený pre lokálny vývoj
-- `ER_shelter.png` - ER diagram dátového modelu informačného systému
+## Features
+### Administrator:
+
+Manages user accounts and creates roles for caregivers and veterinarians. Oversees system operations and permissions.
+
+### Caregiver:
+
+Adds and updates animal records, schedules walks, and approves volunteer reservations. Maintains animal health and history.
+
+### Veterinarian:
+
+Maintains and updates animal health records, including vaccinations and treatments. Responds to caregiver requests for medical care.
+
+### Volunteer:
+
+Reserves animals for walking and tracks the history of their walks. Provides updates on animals’ condition after walks.
+
+### Unregistered User:
+
+Browses available animals and general shelter information without registration. Can view animal profiles and shelter details.
+
+
+## Setup Instructions
+### Prerequisites:
+- Python 3.8+
+- Django
+
+### Installation
+1. `git clone https://github.com/masterofannihilation/iis-2024`
+2. `cd <project directory>`
+3. `python -m venv venv`
+4.  - Windows:
+    `venv\Scripts\activate`
+    - Linux: `source venv/bin/activate`
+5. `pip install -r requirements.txt`
+
+### Run
+1.  - Windows:
+    `venv\Scripts\activate`
+    - Linux: `source venv/bin/activate`
+2. `python manage.py makemigrations`
+3. `python manage.py migrate`
+4. `python manage.py runserver`
+5. Access web application at `http://127.0.0.1:8000/`
+
+
+
+
+
+## Authors
+- Michal Krulich (https://github.com/MichaelTheSynthCat/iis-2024)
+- Stanislav Letaši (https://github.com/stan-leetasi)
+- Boris Hatala (https://github.com/masterofannihilation)
